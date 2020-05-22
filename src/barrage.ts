@@ -5,6 +5,8 @@
 import { BarrageConfig, RawBarrageObject, InitialBarrageConfig, BarrageObject } from './types'
 import TrackManager from './track-manager'
 import { getEl, requestAnimationFrame, cancelAnimationFrame } from './helper'
+import EventEmitter from './event-emitter'
+import { HTML_ELEMENT_NATIVE_EVENTS } from './constants'
 
 const defaultConfig: BarrageConfig = {
   maxTrack: 4,
@@ -15,7 +17,7 @@ const defaultConfig: BarrageConfig = {
   zoom: 1
 }
 
-export default class BarrageMaker {
+export default class BarrageMaker extends EventEmitter {
   el: HTMLElement
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
@@ -25,6 +27,8 @@ export default class BarrageMaker {
   animation: number | null = null
 
   constructor(wrapper: HTMLElement | string, config?: InitialBarrageConfig) {
+    super()
+
     const el = getEl(wrapper)
     if (!el) {
       throw new Error('wrapper is not a HTMLElement')
@@ -48,6 +52,7 @@ export default class BarrageMaker {
     )
 
     this.resize()
+    this._bindNativeEvents()
   }
 
   resize(width?: number) {
@@ -146,5 +151,13 @@ export default class BarrageMaker {
     })
 
     this.animation = requestAnimationFrame(this._render.bind(this))
+  }
+
+  _bindNativeEvents() {
+    HTML_ELEMENT_NATIVE_EVENTS.map(eventName => {
+      this.canvas.addEventListener(eventName, event => {
+        this.$emit(eventName, event)
+      })
+    })
   }
 }
