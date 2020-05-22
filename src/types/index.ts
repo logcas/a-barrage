@@ -4,6 +4,7 @@ export interface BarrageConfig {
   fontColor: string
   duration: number
   trackHeight: number
+  zoom: number
 }
 
 export type InitialBarrageConfig = Partial<BarrageConfig>

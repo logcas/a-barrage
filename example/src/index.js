@@ -43,7 +43,8 @@ new Vue({
   data() {
     return {
       barrageText: '哔哩哔哩干杯',
-      opacity: 1
+      opacity: 1,
+      fontBase: 1
     }
   },
   methods: {
@@ -67,6 +68,9 @@ new Vue({
     },
     opacityChange(val) {
       barrage.setOpacity(val);
+    },
+    fontSizeChange(val) {
+      barrage.setFontSize(val);
     }
   }
 });

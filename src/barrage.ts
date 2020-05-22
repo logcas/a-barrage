@@ -11,7 +11,8 @@ const defaultConfig: BarrageConfig = {
   fontSize: 20,
   fontColor: '#fff',
   duration: 10000,
-  trackHeight: 20 * 1.5
+  trackHeight: 20 * 1.5,
+  zoom: 1
 }
 
 export default class BarrageMaker {
@@ -69,10 +70,14 @@ export default class BarrageMaker {
     this.canvas.style.opacity = `${opacity}`
   }
 
+  setFontSize(zoom: number = 1) {
+    this.config.zoom = zoom
+  }
+
   add(barrage: RawBarrageObject) {
     const { text, color, size } = barrage
     const ctx = this.ctx
-    const fontSize = size || this.config.fontSize
+    const fontSize = (size || this.config.fontSize) * this.config.zoom
     const fontColor = color || this.config.fontColor
 
     ctx.font = `${fontSize}px 'Microsoft Yahei'`
