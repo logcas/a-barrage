@@ -31,7 +31,9 @@ export default class BarrageMaker {
 
     this.el = el
     this.canvas = document.createElement('canvas')
-    this.canvas.className = 'barrage-canvas'
+    this.canvas.style.position = 'absolute'
+    this.canvas.style.top = '0'
+    this.canvas.style.left = '0'
     this.ctx = this.canvas.getContext('2d')!
     this.config = Object.assign({}, defaultConfig, config || {})
 
@@ -39,7 +41,7 @@ export default class BarrageMaker {
 
     this.trackManager = new TrackManager(
       this.canvas.width,
-      this.canvas.width,
+      this.config.trackHeight,
       this.config.maxTrack,
       this.config.duration
     )
@@ -123,8 +125,9 @@ export default class BarrageMaker {
     this.trackManager.forEach((track, trackIndex) => {
       let removeTop = false
       track.forEach((barrage, barrageIndex) => {
-        const { color, text, offset, speed, width } = barrage
+        const { color, text, offset, speed, width, size } = barrage
         ctx.fillStyle = color
+        ctx.font = `${size}px 'Microsoft Yahei'`
         ctx.fillText(text, offset, (trackIndex + 1) * trackHeight)
         barrage.offset -= speed
         if (barrageIndex === 0 && barrage.offset < 0 && Math.abs(barrage.offset) >= width) {

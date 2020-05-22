@@ -47,11 +47,11 @@ export default class TrackManager {
     speed = Math.min(speed, this._defaultSpeed * 2)
 
     const normalizedBarrage = Object.assign({}, barrage, {
-      offset: trackWidth + barrage.width * 1.2,
+      offset: trackWidth,
       speed
     })
     track.push(normalizedBarrage)
-
+    track.offset = trackWidth + barrage.width * 1.2
     return true
   }
 
