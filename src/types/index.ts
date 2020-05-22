@@ -5,6 +5,7 @@ export interface BarrageConfig {
   duration: number
   trackHeight: number
   zoom: number
+  proxyObject: HTMLElement | null
 }
 
 export type InitialBarrageConfig = Partial<BarrageConfig>

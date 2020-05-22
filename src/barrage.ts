@@ -14,7 +14,8 @@ const defaultConfig: BarrageConfig = {
   fontColor: '#fff',
   duration: 10000,
   trackHeight: 20 * 1.5,
-  zoom: 1
+  zoom: 1,
+  proxyObject: null
 }
 
 export default class BarrageMaker extends EventEmitter {
@@ -53,6 +54,7 @@ export default class BarrageMaker extends EventEmitter {
 
     this.resize()
     this._bindNativeEvents()
+    this._delegateEvents()
   }
 
   resize(width?: number) {
@@ -157,6 +159,42 @@ export default class BarrageMaker extends EventEmitter {
     HTML_ELEMENT_NATIVE_EVENTS.map(eventName => {
       this.canvas.addEventListener(eventName, event => {
         this.$emit(eventName, event)
+      })
+    })
+  }
+
+  _delegateEvents() {
+    const proxyObject = this.config.proxyObject
+    if (!(proxyObject instanceof HTMLElement)) {
+      return
+    }
+    type MouseEventName =
+      | 'click'
+      | 'dblclick'
+      | 'mousedown'
+      | 'mousemove'
+      | 'mouseout'
+      | 'mouseover'
+      | 'mouseup'
+    HTML_ELEMENT_NATIVE_EVENTS.map(eventName => {
+      this.canvas.addEventListener(eventName as MouseEventName, (e: MouseEvent) => {
+        const event = new MouseEvent(eventName, {
+          view: window,
+          relatedTarget: proxyObject,
+          altKey: e.altKey,
+          button: e.button,
+          buttons: e.buttons,
+          clientX: e.clientX,
+          clientY: e.clientY,
+          ctrlKey: e.ctrlKey,
+          metaKey: e.metaKey,
+          movementX: e.movementX,
+          movementY: e.movementY,
+          screenX: e.screenX,
+          screenY: e.screenY,
+          shiftKey: e.shiftKey
+        })
+        proxyObject.dispatchEvent(event)
       })
     })
   }

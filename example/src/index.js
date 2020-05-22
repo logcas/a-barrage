@@ -11,15 +11,17 @@ function mockBarrage() {
 const $ = (selector) => document.querySelector(selector);
 export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mouseout,mouseover,mouseup'.split(',');
 
-const barrage = new Barrage('#container');
+const player = $('#my-player');
+const barrage = new Barrage('#container', {
+  proxyObject: player
+});
 
-HTML_ELEMENT_NATIVE_EVENTS.forEach(eventName => {
-  barrage.$on(eventName, () => {
-    console.log('call:' + eventName);
+['click'].forEach(eventName => {
+  player.addEventListener(eventName, e => {
+    console.log(`${eventName} call by player`, e);
   });
 });
 
-const player = $('#my-player');
 let timer= null;
 player.onpause = () => {
   console.log('pause');
