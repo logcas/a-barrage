@@ -1,18 +1,22 @@
 interface EventMap {
-  [x: string]: Array<Function>
+  [x: string]: Array<EventHandler>
+}
+
+interface EventHandler {
+  (...args: any[]): any
 }
 
 export default class EventEmitter {
   private _eventsMap: EventMap = {}
 
-  $on(eventName: string, handler: Function) {
+  $on(eventName: string, handler: EventHandler) {
     const eventsMap = this._eventsMap
     const handlers = eventsMap[eventName] || (eventsMap[eventName] = [])
     handlers.push(handler)
     return this
   }
 
-  $once(eventName: string, handler: Function) {
+  $once(eventName: string, handler: EventHandler) {
     const eventsMap = this._eventsMap
     const handlers = eventsMap[eventName] || (eventsMap[eventName] = [])
     const self = this
@@ -24,7 +28,7 @@ export default class EventEmitter {
     return this
   }
 
-  $off(eventName: string, handler?: Function) {
+  $off(eventName: string, handler?: EventHandler) {
     const eventsMap = this._eventsMap
     if (!handler) {
       eventsMap[eventName].length = 0
