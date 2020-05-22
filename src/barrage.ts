@@ -1,8 +1,4 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
-
-import { BarrageConfig, RawBarrageObject, InitialBarrageConfig, BarrageObject } from './types'
+import { BarrageConfig, RawBarrageObject, BarrageConfigInit, BarrageObject } from './types'
 import TrackManager from './track-manager'
 import { getEl, requestAnimationFrame, cancelAnimationFrame } from './helper'
 import EventEmitter from './event-emitter'
@@ -27,7 +23,7 @@ export default class BarrageMaker extends EventEmitter {
   waitingQueue: BarrageObject[] = []
   animation: number | null = null
 
-  constructor(wrapper: HTMLElement | string, config?: InitialBarrageConfig) {
+  constructor(wrapper: HTMLElement | string, config?: BarrageConfigInit) {
     super()
 
     const el = getEl(wrapper)

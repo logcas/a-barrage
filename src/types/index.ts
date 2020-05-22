@@ -8,7 +8,7 @@ export interface BarrageConfig {
   proxyObject: HTMLElement | null
 }
 
-export type InitialBarrageConfig = Partial<BarrageConfig>
+export type BarrageConfigInit = Partial<BarrageConfig>
 
 export interface RawBarrageObject {
   text: string
