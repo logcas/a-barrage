@@ -1,12 +1,7 @@
 import Track from './track'
 import { BarrageObject } from './types'
 import { TIME_PER_FRAME } from './helper'
-import {
-  findTrackStragy,
-  addBarrageStragy,
-  pushBarrageStragy,
-  renderBarrageStragy
-} from './helper/stragy'
+import { findTrackStragy, addBarrageStragy, pushBarrageStragy, renderBarrageStragy } from './stragy'
 import { isFunction } from 'util'
 
 interface TrackManagerForEachHandler {

@@ -1,10 +1,9 @@
-import { BARRAGE_TYPE } from '../constants'
-import { BarrageObject } from '../types'
-import { isEmptyArray, getArrayRight } from '.'
 import TrackManager from '../track-manager'
+import { BarrageObject } from '../types'
+import { isEmptyArray, getArrayRight } from '../helper'
 
-export const addBarrageStragy = {
-  [BARRAGE_TYPE.SCROLL](this: TrackManager, barrage: BarrageObject) {
+export default {
+  add(this: TrackManager, barrage: BarrageObject) {
     const trackId = this._findMatchestTrack()
     if (trackId === -1) {
       return false
@@ -29,11 +28,8 @@ export const addBarrageStragy = {
     track.push(normalizedBarrage)
     track.offset = trackWidth + barrage.width * 1.2
     return true
-  }
-}
-
-export const findTrackStragy = {
-  [BARRAGE_TYPE.SCROLL](this: TrackManager) {
+  },
+  find(this: TrackManager) {
     let idx = -1
     let max = -Infinity
     this.forEach((track, index) => {
@@ -48,11 +44,8 @@ export const findTrackStragy = {
       }
     })
     return idx
-  }
-}
-
-export const pushBarrageStragy = {
-  [BARRAGE_TYPE.SCROLL](this: TrackManager) {
+  },
+  push(this: TrackManager) {
     let isIntered: boolean
     for (let i = 0; i < this.waitingQueue.length; ) {
       isIntered = this.add(this.waitingQueue[i])
@@ -61,11 +54,8 @@ export const pushBarrageStragy = {
       }
       this.waitingQueue.shift()
     }
-  }
-}
-
-export const renderBarrageStragy = {
-  [BARRAGE_TYPE.SCROLL](this: TrackManager) {
+  },
+  render(this: TrackManager) {
     this._pushBarrage()
     const ctx = this.context
     const trackHeight = this.trackHeight
