@@ -1,23 +1,46 @@
 import Track from './track'
 import { BarrageObject } from './types'
-import { isEmptyArray, getArrayRight, TIME_PER_FRAME } from './helper'
+import { TIME_PER_FRAME } from './helper'
+import {
+  findTrackStragy,
+  addBarrageStragy,
+  pushBarrageStragy,
+  renderBarrageStragy
+} from './helper/stragy'
+import { isFunction } from 'util'
 
 interface TrackManagerForEachHandler {
   (track: Track, index: number, array: Track[]): void
 }
 
+type BarrageType = 'scroll' | 'fixed-top' | 'fixed-bottom'
+
+interface TrackManagerConfig {
+  trackWidth: number
+  trackHeight: number
+  duration: number
+  numbersOfTrack: number
+  type: BarrageType
+}
+
 export default class TrackManager {
+  context: CanvasRenderingContext2D
   trackWidth: number
   trackHeight: number
   tracks: Track[] = []
   duration: number
+  type: BarrageType
+  waitingQueue: BarrageObject[] = []
 
-  constructor(width: number, height: number, trackSum: number, duration: number) {
-    this.trackHeight = height
-    this.trackWidth = width
+  constructor(context: CanvasRenderingContext2D, config: TrackManagerConfig) {
+    this.context = context
+    const { trackWidth, trackHeight, duration, numbersOfTrack, type } = config
+    this.trackHeight = trackHeight
+    this.trackWidth = trackWidth
     this.duration = duration
+    this.type = type
 
-    for (let i = 0; i < trackSum; ++i) {
+    for (let i = 0; i < numbersOfTrack; ++i) {
       this.tracks[i] = new Track()
     }
   }
@@ -29,47 +52,23 @@ export default class TrackManager {
   }
 
   add(barrage: BarrageObject) {
-    const trackId = this._findMatchestTrack()
-    if (trackId === -1) {
-      return false
-    }
-
-    const track = this.tracks[trackId]
-    const trackOffset = track.offset
-    const trackWidth = this.trackWidth
-    let speed: number
-    if (isEmptyArray(track.barrages)) {
-      speed = this._defaultSpeed * this._randomSpeed
-    } else {
-      const { speed: preSpeed } = getArrayRight(track.barrages)
-      speed = (trackWidth * preSpeed) / trackOffset
-    }
-    speed = Math.min(speed, this._defaultSpeed * 2)
-
-    const normalizedBarrage = Object.assign({}, barrage, {
-      offset: trackWidth,
-      speed
-    })
-    track.push(normalizedBarrage)
-    track.offset = trackWidth + barrage.width * 1.2
-    return true
+    const fn = addBarrageStragy[this.type]
+    return isFunction(fn) && fn.call(this, barrage)
   }
 
   _findMatchestTrack() {
-    let idx = -1
-    let max = -Infinity
-    this.forEach((track, index) => {
-      const trackOffset = track.offset
-      if (trackOffset > this.trackWidth) {
-        return
-      }
-      const t = this.trackWidth - trackOffset
-      if (t > max) {
-        idx = index
-        max = t
-      }
-    })
-    return idx
+    const fn = findTrackStragy[this.type]
+    return isFunction(fn) ? fn.call(this) : -1
+  }
+
+  _pushBarrage() {
+    const fn = pushBarrageStragy[this.type]
+    return isFunction(fn) ? fn.call(this) : false
+  }
+
+  render() {
+    const fn = renderBarrageStragy[this.type]
+    return isFunction(fn) && fn.call(this)
   }
 
   get _defaultSpeed(): number {
@@ -82,5 +81,14 @@ export default class TrackManager {
 
   reset() {
     this.forEach(track => track.reset())
+  }
+
+  resize(trackWidth?: number, trackHeight?: number) {
+    if (trackWidth) {
+      this.trackWidth = trackWidth
+    }
+    if (trackHeight) {
+      this.trackHeight = trackHeight
+    }
   }
 }

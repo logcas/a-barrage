@@ -1,4 +1,11 @@
-import { BarrageConfig, RawBarrageObject, BarrageConfigInit, BarrageObject } from './types'
+import {
+  BarrageConfig,
+  RawBarrageObject,
+  BarrageConfigInit,
+  BarrageObject,
+  TrackManagerMap,
+  TrackManagerMapKey
+} from './types'
 import TrackManager from './track-manager'
 import { getEl, requestAnimationFrame, cancelAnimationFrame } from './helper'
 import EventEmitter from './event-emitter'
@@ -11,7 +18,8 @@ const defaultConfig: BarrageConfig = {
   duration: 10000,
   trackHeight: 20 * 1.5,
   zoom: 1,
-  proxyObject: null
+  proxyObject: null,
+  usePointerEvents: true
 }
 
 export default class BarrageMaker extends EventEmitter {
@@ -19,8 +27,7 @@ export default class BarrageMaker extends EventEmitter {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   config: BarrageConfig
-  trackManager: TrackManager
-  waitingQueue: BarrageObject[] = []
+  trackManagerMap: TrackManagerMap
   animation: number | null = null
 
   constructor(wrapper: HTMLElement | string, config?: BarrageConfigInit) {
@@ -39,33 +46,56 @@ export default class BarrageMaker extends EventEmitter {
     this.ctx = this.canvas.getContext('2d')!
     this.config = Object.assign({}, defaultConfig, config || {})
 
+    // 兼容性：IE11+ / 非IE基本全支持
+    // pointer-events 避免上层canvas阻碍下层点击
+    if (this.config.usePointerEvents) {
+      this.canvas.style.pointerEvents = 'none'
+    }
+
     this.el.appendChild(this.canvas)
 
-    this.trackManager = new TrackManager(
-      this.canvas.width,
-      this.config.trackHeight,
-      this.config.maxTrack,
-      this.config.duration
-    )
+    this.trackManagerMap = {
+      scroll: new TrackManager(this.ctx, {
+        trackWidth: this.canvas.width,
+        trackHeight: this.config.trackHeight,
+        numbersOfTrack: this.config.maxTrack,
+        duration: this.config.duration,
+        type: 'scroll'
+      }),
+      'fixed-top': new TrackManager(this.ctx, {
+        trackWidth: this.canvas.width,
+        trackHeight: this.config.trackHeight,
+        numbersOfTrack: this.config.maxTrack,
+        duration: this.config.duration,
+        type: 'fixed-top'
+      }),
+      'fixed-bottom': new TrackManager(this.ctx, {
+        trackWidth: this.canvas.width,
+        trackHeight: this.config.trackHeight,
+        numbersOfTrack: this.config.maxTrack,
+        duration: this.config.duration,
+        type: 'fixed-bottom'
+      })
+    }
 
     this.resize()
     this._bindNativeEvents()
     this._delegateEvents()
   }
 
-  resize(width?: number) {
+  resize(width?: number, height?: number) {
     width = width || this.el.offsetWidth
+    height = height || this.el.offsetHeight
     this.canvas.width = width
-    this.canvas.height = this.config.maxTrack * this.config.trackHeight * 1.5
+    this.canvas.height = height
     this.canvas.style.width = width + 'px'
     this.canvas.style.height = this.canvas.height + 'px'
-    this.trackManager.trackHeight = this.canvas.height
-    this.trackManager.trackWidth = this.canvas.width
+    this._forEachManager(manager => manager.resize(this.canvas.width))
   }
 
   clear() {
     const { width, height } = this.canvas
-    this.trackManager.reset()
+    this._forEachManager(manager => manager.reset())
     this.ctx.clearRect(0, 0, width, height)
   }
 
@@ -77,7 +107,7 @@ export default class BarrageMaker extends EventEmitter {
     this.config.zoom = zoom
   }
 
-  add(barrage: RawBarrageObject) {
+  add(barrage: RawBarrageObject, type: TrackManagerMapKey = 'scroll') {
     const { text, color, size } = barrage
     const ctx = this.ctx
     const fontSize = (size || this.config.fontSize) * this.config.zoom
@@ -93,7 +123,7 @@ export default class BarrageMaker extends EventEmitter {
       speed: 0,
       offset: 0
     }
-    this.waitingQueue.push(barrageObject)
+    this.trackManagerMap[type].waitingQueue.push(barrageObject)
   }
 
   start() {
@@ -111,15 +141,10 @@ export default class BarrageMaker extends EventEmitter {
     this.animation = null
   }
 
-  _pushValidBarrage() {
-    let isIntered: boolean
-    for (let i = 0; i < this.waitingQueue.length; ) {
-      isIntered = this.trackManager.add(this.waitingQueue[i])
-      if (!isIntered) {
-        break
-      }
-      this.waitingQueue.shift()
-    }
+  _forEachManager(handler: (trackManager: TrackManager) => any) {
+    Object.keys(this.trackManagerMap).forEach(key =>
+      handler.call(this, this.trackManagerMap[key as TrackManagerMapKey])
+    )
   }
 
   _render() {
@@ -127,26 +152,7 @@ export default class BarrageMaker extends EventEmitter {
     ctx.shadowBlur = 2
     ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    this._pushValidBarrage()
-    const trackHeight = this.config.trackHeight
-
-    this.trackManager.forEach((track, trackIndex) => {
-      let removeTop = false
-      track.forEach((barrage, barrageIndex) => {
-        const { color, text, offset, speed, width, size } = barrage
-        ctx.fillStyle = color
-        ctx.font = `${size}px 'Microsoft Yahei'`
-        ctx.fillText(text, offset, (trackIndex + 1) * trackHeight)
-        barrage.offset -= speed
-        if (barrageIndex === 0 && barrage.offset < 0 && Math.abs(barrage.offset) >= width) {
-          removeTop = true
-        }
-      })
-      track.updateOffset()
-      if (removeTop) {
-        track.removeTop()
-      }
-    })
+    this._forEachManager(manager => manager.render())
 
     this.animation = requestAnimationFrame(this._render.bind(this))
   }

@@ -19,3 +19,7 @@ export const requestAnimationFrame =
   window.requestAnimationFrame || window.webkitRequestAnimationFrame
 
 export const cancelAnimationFrame = window.cancelAnimationFrame || window.webkitCancelAnimationFrame
+
+export const isFunction = function(fn: any): fn is Function {
+  return typeof fn === 'function'
+}

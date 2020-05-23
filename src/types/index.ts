@@ -1,3 +1,5 @@
+import TrackManager from '../track-manager'
+
 export interface BarrageConfig {
   maxTrack: number
   fontSize: number
@@ -6,6 +8,7 @@ export interface BarrageConfig {
   trackHeight: number
   zoom: number
   proxyObject: HTMLElement | null
+  usePointerEvents: boolean
 }
 
 export type BarrageConfigInit = Partial<BarrageConfig>
@@ -24,3 +27,11 @@ export interface BarrageObject {
   speed: number
   offset: number
 }
+
+export interface TrackManagerMap {
+  scroll: TrackManager
+  'fixed-top': TrackManager
+  'fixed-bottom': TrackManager
+}
+
+export type TrackManagerMapKey = keyof TrackManagerMap
