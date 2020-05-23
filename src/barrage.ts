@@ -4,22 +4,30 @@ import {
   BarrageConfigInit,
   BarrageObject,
   TrackManagerMap,
-  TrackManagerMapKey
+  TrackManagerMapKey,
+  GeneralTrackConfig
 } from './types'
 import TrackManager from './track-manager'
-import { getEl, requestAnimationFrame, cancelAnimationFrame } from './helper'
+import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from './helper'
 import EventEmitter from './event-emitter'
 import { HTML_ELEMENT_NATIVE_EVENTS } from './constants'
 
-const defaultConfig: BarrageConfig = {
+const generalDefaultConfig: GeneralTrackConfig = {
   maxTrack: 4,
   fontSize: 20,
   fontColor: '#fff',
   duration: 10000,
-  trackHeight: 20 * 1.5,
+  trackHeight: 20 * 1.5
+}
+
+const defaultConfig: BarrageConfig = {
   zoom: 1,
   proxyObject: null,
-  usePointerEvents: true
+  usePointerEvents: true,
+  scroll: generalDefaultConfig,
+  fixedTop: generalDefaultConfig,
+  fixedBottom: generalDefaultConfig,
+  ...generalDefaultConfig
 }
 
 export default class BarrageMaker extends EventEmitter {
@@ -44,7 +52,7 @@ export default class BarrageMaker extends EventEmitter {
     this.canvas.style.top = '0'
     this.canvas.style.left = '0'
     this.ctx = this.canvas.getContext('2d')!
-    this.config = Object.assign({}, defaultConfig, config || {})
+    this.config = deepMerge(defaultConfig, config || {})
 
     // 兼容性：IE11+ / 非IE基本全支持
     // pointer-events 避免上层canvas阻碍下层点击

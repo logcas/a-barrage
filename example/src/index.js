@@ -13,7 +13,11 @@ export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mo
 
 const player = $('#my-player');
 const barrage = new Barrage('#container', {
-  proxyObject: player
+  proxyObject: player,
+  scroll: {
+    fontSize: 28,
+    duration: 5000
+  }
 });
 
 ['click'].forEach(eventName => {
