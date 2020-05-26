@@ -2,7 +2,6 @@ import {
   BarrageConfig,
   RawBarrageObject,
   BarrageConfigInit,
-  BarrageObject,
   TrackManagerMap,
   TrackManagerMapKey,
   GeneralTrackConfig,

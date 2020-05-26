@@ -1,4 +1,4 @@
-import { BarrageObject, ScrollBarrageObject } from './types'
+import { BarrageObject } from './types'
 import { isScrollBarrage } from './helper'
 
 interface TrackForEachHandler<T extends BarrageObject> {
