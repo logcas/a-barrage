@@ -48,7 +48,9 @@ export function deepMerge(...objects: any[]): any {
       if (!ret.hasOwnProperty(key)) {
         ret[key] = obj[key]
       } else {
-        if (isObject(obj[key])) {
+        if (Array.isArray(obj[key])) {
+          ret[key] = obj[key]
+        } else if (isObject(obj[key])) {
           ret[key] = deepMerge(ret[key], obj[key])
         } else {
           ret[key] = obj[key]
