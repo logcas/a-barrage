@@ -1,3 +1,5 @@
+import { ScrollBarrageObject, FixedBarrageObejct } from '../types'
+
 export function isEmptyArray<T>(array: T[]): boolean {
   return array.length === 0
 }
@@ -55,4 +57,12 @@ export function deepMerge(...objects: any[]): any {
     })
   })
   return ret
+}
+
+export function isScrollBarrage(x: any): x is ScrollBarrageObject {
+  return x.hasOwnProperty('speed') && x.hasOwnProperty('offset')
+}
+
+export function isFixedBarrage(x: any): x is FixedBarrageObejct {
+  return x.hasOwnProperty('duration')
 }

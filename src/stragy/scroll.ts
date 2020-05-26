@@ -1,9 +1,10 @@
 import TrackManager from '../track-manager'
-import { BarrageObject } from '../types'
+import { ScrollBarrageObject } from '../types'
 import { isEmptyArray, getArrayRight } from '../helper'
+import Track from '../track'
 
 export default {
-  add(this: TrackManager, barrage: BarrageObject) {
+  add(this: TrackManager<ScrollBarrageObject>, barrage: ScrollBarrageObject) {
     const trackId = this._findMatchestTrack()
     if (trackId === -1) {
       return false
@@ -16,7 +17,7 @@ export default {
     if (isEmptyArray(track.barrages)) {
       speed = this._defaultSpeed * this._randomSpeed
     } else {
-      const { speed: preSpeed } = getArrayRight(track.barrages)
+      const { speed: preSpeed } = getArrayRight<ScrollBarrageObject>(track.barrages)
       speed = (trackWidth * preSpeed) / trackOffset
     }
     speed = Math.min(speed, this._defaultSpeed * 2)
@@ -29,7 +30,7 @@ export default {
     track.offset = trackWidth + barrage.width * 1.2
     return true
   },
-  find(this: TrackManager) {
+  find(this: TrackManager<ScrollBarrageObject>) {
     let idx = -1
     let max = -Infinity
     this.forEach((track, index) => {
@@ -45,7 +46,7 @@ export default {
     })
     return idx
   },
-  push(this: TrackManager) {
+  push(this: TrackManager<ScrollBarrageObject>) {
     let isIntered: boolean
     for (let i = 0; i < this.waitingQueue.length; ) {
       isIntered = this.add(this.waitingQueue[i])
@@ -55,11 +56,11 @@ export default {
       this.waitingQueue.shift()
     }
   },
-  render(this: TrackManager) {
+  render(this: TrackManager<ScrollBarrageObject>) {
     this._pushBarrage()
     const ctx = this.context
     const trackHeight = this.trackHeight
-    this.forEach((track, trackIndex) => {
+    this.forEach((track: Track<ScrollBarrageObject>, trackIndex) => {
       let removeTop = false
       track.forEach((barrage, barrageIndex) => {
         const { color, text, offset, speed, width, size } = barrage

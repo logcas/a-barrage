@@ -1,14 +1,15 @@
-import { BarrageObject } from './types'
+import { BarrageObject, ScrollBarrageObject } from './types'
+import { isScrollBarrage } from './helper'
 
-interface TrackForEachHandler {
-  (track: BarrageObject, index: number, array: BarrageObject[]): void
+interface TrackForEachHandler<T extends BarrageObject> {
+  (track: T, index: number, array: T[]): void
 }
 
-export default class BarrageTrck {
-  barrages: BarrageObject[] = []
+export default class BarrageTrck<T extends BarrageObject> {
+  barrages: T[] = []
   offset: number = 0
 
-  forEach(handler: TrackForEachHandler) {
+  forEach(handler: TrackForEachHandler<T>) {
     for (let i = 0; i < this.barrages.length; ++i) {
       handler(this.barrages[i], i, this.barrages)
     }
@@ -19,7 +20,7 @@ export default class BarrageTrck {
     this.offset = 0
   }
 
-  push(...items: BarrageObject[]) {
+  push(...items: T[]) {
     this.barrages.push(...items)
   }
 
@@ -29,7 +30,7 @@ export default class BarrageTrck {
 
   updateOffset() {
     const endBarrage = this.barrages[this.barrages.length - 1]
-    if (endBarrage) {
+    if (endBarrage && isScrollBarrage(endBarrage)) {
       const { speed } = endBarrage
       this.offset -= speed
     }

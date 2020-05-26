@@ -36,14 +36,21 @@ export interface BarrageObject {
   color: string
   size: number
   width: number
-  speed: number
   offset: number
 }
 
+export interface ScrollBarrageObject extends BarrageObject {
+  speed: number
+}
+
+export interface FixedBarrageObejct extends BarrageObject {
+  duration: number
+}
+
 export interface TrackManagerMap {
-  scroll: TrackManager
-  'fixed-top': TrackManager
-  'fixed-bottom': TrackManager
+  scroll: TrackManager<ScrollBarrageObject>
+  'fixed-top': TrackManager<FixedBarrageObejct>
+  'fixed-bottom': TrackManager<FixedBarrageObejct>
 }
 
 export type TrackManagerMapKey = keyof TrackManagerMap

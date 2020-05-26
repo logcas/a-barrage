@@ -5,7 +5,9 @@ import {
   BarrageObject,
   TrackManagerMap,
   TrackManagerMapKey,
-  GeneralTrackConfig
+  GeneralTrackConfig,
+  ScrollBarrageObject,
+  FixedBarrageObejct
 } from './types'
 import TrackManager from './track-manager'
 import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from './helper'
@@ -63,21 +65,21 @@ export default class BarrageMaker extends EventEmitter {
     this.el.appendChild(this.canvas)
 
     this.trackManagerMap = {
-      scroll: new TrackManager(this.ctx, {
+      scroll: new TrackManager<ScrollBarrageObject>(this.canvas, {
         trackWidth: this.canvas.width,
         trackHeight: this.config.trackHeight,
         numbersOfTrack: this.config.maxTrack,
         duration: this.config.duration,
         type: 'scroll'
       }),
-      'fixed-top': new TrackManager(this.ctx, {
+      'fixed-top': new TrackManager<FixedBarrageObejct>(this.canvas, {
         trackWidth: this.canvas.width,
         trackHeight: this.config.trackHeight,
         numbersOfTrack: this.config.maxTrack,
         duration: this.config.duration,
         type: 'fixed-top'
       }),
-      'fixed-bottom': new TrackManager(this.ctx, {
+      'fixed-bottom': new TrackManager<FixedBarrageObejct>(this.canvas, {
         trackWidth: this.canvas.width,
         trackHeight: this.config.trackHeight,
         numbersOfTrack: this.config.maxTrack,
@@ -123,15 +125,27 @@ export default class BarrageMaker extends EventEmitter {
 
     ctx.font = `${fontSize}px 'Microsoft Yahei'`
     const { width } = ctx.measureText(text)
-    const barrageObject: BarrageObject = {
-      text,
-      width,
-      color: fontColor,
-      size: fontSize,
-      speed: 0,
-      offset: 0
+    if (type === 'scroll') {
+      const barrageObject: ScrollBarrageObject = {
+        text,
+        width,
+        color: fontColor,
+        size: fontSize,
+        speed: 0,
+        offset: 0
+      }
+      this.trackManagerMap[type].waitingQueue.push(barrageObject)
+    } else {
+      const barrageObject: FixedBarrageObejct = {
+        text,
+        width,
+        color: fontColor,
+        size: fontSize,
+        duration: 0,
+        offset: 0
+      }
+      this.trackManagerMap[type].waitingQueue.push(barrageObject)
     }
-    this.trackManagerMap[type].waitingQueue.push(barrageObject)
   }
 
   start() {
@@ -149,7 +163,11 @@ export default class BarrageMaker extends EventEmitter {
     this.animation = null
   }
 
-  _forEachManager(handler: (trackManager: TrackManager) => any) {
+  _forEachManager(
+    handler: (
+      trackManager: TrackManager<ScrollBarrageObject> | TrackManager<FixedBarrageObejct>
+    ) => any
+  ) {
     Object.keys(this.trackManagerMap).forEach(key =>
       handler.call(this, this.trackManagerMap[key as TrackManagerMapKey])
     )

@@ -38,7 +38,9 @@ player.onplay = () => {
   timer = setTimeout(function insertBarrage() {
     let sum = 1 + Math.floor(20 * Math.random());
     while(sum--) {
-      barrage.add(mockBarrage());
+      barrage.add(mockBarrage(), 'fixed-top');
+      barrage.add(mockBarrage(), 'scroll');
+      barrage.add(mockBarrage(), 'fixed-bottom');
     }
     timer = setTimeout(insertBarrage, 2000 + Math.floor(Math.random() * 10000));
   }, 2000);
@@ -72,7 +74,7 @@ new Vue({
       }
       barrage.add({
         text: this.barrageText
-      });
+      }, 'scroll');
       this.barrageText = '';
       this.$notify({
         title: '成功',

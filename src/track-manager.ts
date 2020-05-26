@@ -4,8 +4,8 @@ import { TIME_PER_FRAME } from './helper'
 import { findTrackStragy, addBarrageStragy, pushBarrageStragy, renderBarrageStragy } from './stragy'
 import { isFunction } from 'util'
 
-interface TrackManagerForEachHandler {
-  (track: Track, index: number, array: Track[]): void
+interface TrackManagerForEachHandler<T extends BarrageObject> {
+  (track: Track<T>, index: number, array: Track<T>[]): void
 }
 
 type BarrageType = 'scroll' | 'fixed-top' | 'fixed-bottom'
@@ -18,17 +18,19 @@ interface TrackManagerConfig {
   type: BarrageType
 }
 
-export default class TrackManager {
+export default class TrackManager<T extends BarrageObject> {
+  canvas: HTMLCanvasElement
   context: CanvasRenderingContext2D
   trackWidth: number
   trackHeight: number
-  tracks: Track[] = []
+  tracks: Track<T>[] = []
   duration: number
   type: BarrageType
-  waitingQueue: BarrageObject[] = []
+  waitingQueue: T[] = []
 
-  constructor(context: CanvasRenderingContext2D, config: TrackManagerConfig) {
-    this.context = context
+  constructor(canvas: HTMLCanvasElement, config: TrackManagerConfig) {
+    this.canvas = canvas
+    this.context = canvas.getContext('2d')!
     const { trackWidth, trackHeight, duration, numbersOfTrack, type } = config
     this.trackHeight = trackHeight
     this.trackWidth = trackWidth
@@ -40,18 +42,18 @@ export default class TrackManager {
     }
   }
 
-  forEach(handler: TrackManagerForEachHandler) {
+  forEach(handler: TrackManagerForEachHandler<T>) {
     for (let i = 0; i < this.tracks.length; ++i) {
       handler(this.tracks[i], i, this.tracks)
     }
   }
 
-  add(barrage: BarrageObject) {
+  add(barrage: T) {
     const fn = addBarrageStragy[this.type]
     return isFunction(fn) && fn.call(this, barrage)
   }
 
-  _findMatchestTrack() {
+  _findMatchestTrack(): number {
     const fn = findTrackStragy[this.type]
     return isFunction(fn) ? fn.call(this) : -1
   }
@@ -61,9 +63,9 @@ export default class TrackManager {
     return isFunction(fn) ? fn.call(this) : false
   }
 
-  render() {
+  render(): void {
     const fn = renderBarrageStragy[this.type]
-    return isFunction(fn) && fn.call(this)
+    isFunction(fn) && fn.call(this)
   }
 
   get _defaultSpeed(): number {
