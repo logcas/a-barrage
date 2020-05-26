@@ -1,6 +1,7 @@
 import TrackManager from '../track-manager'
 import { FixedBarrageObejct } from '../types'
-import { isEmptyArray, TIME_PER_FRAME } from '../helper'
+import { isEmptyArray } from '../helper'
+import { TIME_PER_FRAME } from '../constants'
 
 export default {
   add(this: TrackManager<FixedBarrageObejct>, barrage: FixedBarrageObejct) {

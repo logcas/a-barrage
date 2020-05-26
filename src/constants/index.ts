@@ -15,3 +15,5 @@ export const BARRAGE_TYPE: BarrageTypeObject = {
   FIXED_TOP: 'fixed-top',
   FIXED_BOTTOM: 'fixed-bottom'
 }
+
+export const TIME_PER_FRAME = 16.6

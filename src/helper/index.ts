@@ -8,8 +8,6 @@ export function getArrayRight<T>(array: T[]): T {
   return array[array.length - 1]
 }
 
-export const TIME_PER_FRAME = 16.6
-
 export function getEl(el: HTMLElement | string): HTMLElement | null {
   if (el instanceof HTMLElement) {
     return el
