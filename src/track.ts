@@ -5,7 +5,7 @@ interface TrackForEachHandler<T extends BarrageObject> {
   (track: T, index: number, array: T[]): void
 }
 
-export default class BarrageTrck<T extends BarrageObject> {
+export default class BarrageTrack<T extends BarrageObject> {
   barrages: T[] = []
   offset: number = 0
 
