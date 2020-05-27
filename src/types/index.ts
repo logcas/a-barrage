@@ -1,29 +1,15 @@
 import TrackManager from '../track-manager'
 
-export interface GeneralTrackConfig {
+export interface BarrageConfig {
+  zoom: number
+  proxyObject: HTMLElement | null
+  usePointerEvents: boolean
   maxTrack: number
   fontSize: number
   fontColor: string
   duration: number
   trackHeight: number
 }
-
-export interface BarrageConfig extends GeneralTrackConfig {
-  zoom: number
-  proxyObject: HTMLElement | null
-  usePointerEvents: boolean
-  scroll: GeneralTrackConfig
-  fixedTop: GeneralTrackConfig
-  fixedBottom: GeneralTrackConfig
-}
-
-export type BarrageConfigInit =
-  | Partial<BarrageConfig>
-  | {
-      scroll?: Partial<GeneralTrackConfig>
-      fixedTop?: Partial<GeneralTrackConfig>
-      fixedBottom?: Partial<GeneralTrackConfig>
-    }
 
 export interface RawBarrageObject {
   text: string

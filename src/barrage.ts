@@ -1,10 +1,8 @@
 import {
   BarrageConfig,
   RawBarrageObject,
-  BarrageConfigInit,
   TrackManagerMap,
   TrackManagerMapKey,
-  GeneralTrackConfig,
   ScrollBarrageObject,
   FixedBarrageObejct
 } from './types'
@@ -13,7 +11,10 @@ import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from '.
 import EventEmitter from './event-emitter'
 import { HTML_ELEMENT_NATIVE_EVENTS } from './constants'
 
-const generalDefaultConfig: GeneralTrackConfig = {
+const defaultConfig: BarrageConfig = {
+  zoom: 1,
+  proxyObject: null,
+  usePointerEvents: true,
   maxTrack: 4,
   fontSize: 20,
   fontColor: '#fff',
@@ -21,15 +22,7 @@ const generalDefaultConfig: GeneralTrackConfig = {
   trackHeight: 20 * 1.5
 }
 
-const defaultConfig: BarrageConfig = {
-  zoom: 1,
-  proxyObject: null,
-  usePointerEvents: true,
-  scroll: generalDefaultConfig,
-  fixedTop: generalDefaultConfig,
-  fixedBottom: generalDefaultConfig,
-  ...generalDefaultConfig
-}
+type BarrageConfigInit = Partial<BarrageConfig>
 
 export default class BarrageMaker extends EventEmitter {
   el: HTMLElement
