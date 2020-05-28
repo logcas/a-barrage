@@ -1,7 +1,7 @@
 {
-  "name": "barrage",
+  "name": "a-barrage",
   "version": "0.0.0",
-  "description": "",
+  "description": "JavaScript Danmu(Barrage) Library",
   "keywords": [],
   "main": "dist/barrage.umd.js",
   "module": "dist/barrage.es5.js",
