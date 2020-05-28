@@ -36,12 +36,21 @@ player.onplay = () => {
   console.log('start');
   barrage.start();
   timer = setTimeout(function insertBarrage() {
-    let sum = 1 + Math.floor(20 * Math.random());
-    while(sum--) {
-      barrage.add(mockBarrage(), 'fixed-top');
+    let sumScroll = 1 + Math.floor(5 * Math.random());
+    while(sumScroll--) {
       barrage.add(mockBarrage(), 'scroll');
+    }
+
+    let sumFixedTop = 1 + Math.floor(5 * Math.random());
+    while(sumFixedTop--) {
+      barrage.add(mockBarrage(), 'fixed-top');
+    }
+
+    let sumFixedBottom = 1 + Math.floor(5 * Math.random());
+    while(sumFixedBottom--) {
       barrage.add(mockBarrage(), 'fixed-bottom');
     }
+
     timer = setTimeout(insertBarrage, 2000 + Math.floor(Math.random() * 10000));
   }, 2000);
 };
@@ -64,7 +73,7 @@ new Vue({
     }
   },
   methods: {
-    sendBarrage() {
+    sendBarrage(type) {
       if (this.barrageText.trim() === '') {
         this.$notify.error({
           title: '失败',
@@ -74,7 +83,7 @@ new Vue({
       }
       barrage.add({
         text: this.barrageText
-      }, 'scroll');
+      }, type);
       this.barrageText = '';
       this.$notify({
         title: '成功',

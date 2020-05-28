@@ -26,7 +26,9 @@
       <div style="margin-top: 10px;">
         <span>输入弹幕：</span>
         <el-input v-model="barrageText" placeholder="请输入内容" style="width: 400px;"></el-input>
-        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage">发送弹幕</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('scroll')">发送滚动弹幕</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-top')">发送顶部弹幕</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-bottom')">发送底部弹幕</el-button>
       </div>
       <div style="margin-top: 10px;">
         <span>弹幕不透明度：</span>
