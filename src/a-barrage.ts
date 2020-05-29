@@ -25,26 +25,25 @@ const defaultConfig: BarrageConfig = {
 type BarrageConfigInit = Partial<BarrageConfig>
 
 export default class BarrageMaker extends EventEmitter {
-  el: HTMLElement
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   config: BarrageConfig
   trackManagerMap: TrackManagerMap
   animation: number | null = null
 
-  constructor(wrapper: HTMLElement | string, config?: BarrageConfigInit) {
+  constructor(el: HTMLElement | string, config?: BarrageConfigInit) {
     super()
 
-    const el = getEl(wrapper)
-    if (!el) {
+    const canvas = getEl(el)
+    if (!canvas) {
       throw new Error('wrapper is not a HTMLElement')
     }
 
-    this.el = el
-    this.canvas = document.createElement('canvas')
-    this.canvas.style.position = 'absolute'
-    this.canvas.style.top = '0'
-    this.canvas.style.left = '0'
+    if (!(canvas instanceof HTMLCanvasElement)) {
+      throw new Error('el must be a HTMLCanvasElement!')
+    }
+
+    this.canvas = canvas
     this.ctx = this.canvas.getContext('2d')!
     this.config = deepMerge(defaultConfig, config || {})
 
@@ -53,8 +52,6 @@ export default class BarrageMaker extends EventEmitter {
     if (this.config.usePointerEvents) {
       this.canvas.style.pointerEvents = 'none'
     }
-
-    this.el.appendChild(this.canvas)
 
     this.trackManagerMap = {
       scroll: new TrackManager<ScrollBarrageObject>(this.canvas, {
@@ -85,14 +82,9 @@ export default class BarrageMaker extends EventEmitter {
     this._delegateEvents()
   }
 
-  resize(width?: number, height?: number) {
-    width = width || this.el.offsetWidth
-    height = height || this.el.offsetHeight
-    this.canvas.width = width
-    this.canvas.height = height
-    this.canvas.style.width = width + 'px'
-    this.canvas.style.height = this.canvas.height + 'px'
-    this._forEachManager(manager => manager.resize(this.canvas.width))
+  resize(width?: number) {
+    width = width || this.canvas.width
+    this._forEachManager(manager => manager.resize(width))
   }
 
   clear() {
