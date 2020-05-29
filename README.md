@@ -3,19 +3,17 @@
 
 ## 🧐 如何使用
 
-为了使弹幕画布与`<video>`标签重合，一般来说通常需要这样的结构：
+`A-Barrage`是基于Canvas渲染的，因此你需要准备一个画布：
 
 ```html
-<div id="container">
-  <video/>
-</div>
+<canvas id="danmu"></canvas>
 ```
 
-然后，实例化一个`aBarrage`对象，同时传入`wrapper`元素：
+然后，实例化一个`aBarrage`对象，同时传入`canvas`元素：
 
 ```js
 new aBarrage(
-  '#container',
+  '#danmu',
   config
 )
 ```
@@ -93,8 +91,8 @@ RawBarrageObject {
 ### stop()
 弹幕暂停
 
-### resize(width?, height?)
-弹幕画布是根据`wrapper`元素的宽高去覆盖的，因此，如果你的`wrapper`元素宽度或高度发生改变，请调用这个函数去使弹幕覆盖整个元素。其中，`width`和`height`都是可选的，如果不传，就通过`offsetWidth`和`offsetHeight`获取真实值。
+### resize([,width])
+宽度会影响弹幕轨道的宽度，当`canvas`的宽度更改时，务必调用该方法更新轨道宽度。
 
 ### clear()
 清空弹幕
@@ -104,6 +102,18 @@ RawBarrageObject {
 
 ### setFontSize(zoom = 1)
 全局设置文字的缩放大小。需要注意的是，`setFontSize`并不会改变实话配置中的`fontSize`大小，而是通过设置`config.zoom`（缩放比率）的方式更改输出文字的大小。默认为`1`。
+
+### $on(eventName, handler)
+绑定事件处理器。
+
+### $once(eventName, handler)
+绑定事件处理器，但它只会执行一次。
+
+### $off(eventName[, handler])
+接触事件处理器，当`handler`不传时，会消除`eventName`事件的所有回调。
+
+### $emit(eventName[, ...args])
+触发事件处理器，从第二个参数开始可以传入回调函数的参数。
 
 ## License
 MIT
