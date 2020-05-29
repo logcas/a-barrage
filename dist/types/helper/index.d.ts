@@ -1,0 +1,13 @@
+import { ScrollBarrageObject, FixedBarrageObejct } from '../types';
+export declare function isEmptyArray<T>(array: T[]): boolean;
+export declare function getArrayRight<T>(array: T[]): T;
+export declare function getEl(el: HTMLElement | string): HTMLElement | null;
+export declare const requestAnimationFrame: ((callback: FrameRequestCallback) => number) & typeof globalThis.requestAnimationFrame;
+export declare const cancelAnimationFrame: ((handle: number) => void) & typeof globalThis.cancelAnimationFrame;
+export declare const isFunction: (fn: any) => fn is Function;
+export declare const isNull: (o: any) => o is null;
+export declare const isUndefined: (o: any) => o is undefined;
+export declare const isObject: (o: any) => o is object;
+export declare function deepMerge(...objects: any[]): any;
+export declare function isScrollBarrage(x: any): x is ScrollBarrageObject;
+export declare function isFixedBarrage(x: any): x is FixedBarrageObejct;
