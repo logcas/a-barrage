@@ -33,7 +33,8 @@
     "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
-    "example": "webpack-dev-server --config=./example/webpack.config.js"
+    "example": "webpack-dev-server --config=./example/webpack.config.js",
+    "build:demo": "webpack --config=./example/webpack.config.js"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [
