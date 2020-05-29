@@ -12,7 +12,8 @@ const $ = (selector) => document.querySelector(selector);
 export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mouseout,mouseover,mouseup'.split(',');
 
 const player = $('#my-player');
-const barrage = new Barrage('#container', {
+const danmu = $('#danmu');
+const barrage = new Barrage(danmu, {
   proxyObject: player,
   scroll: {
     fontSize: 28,
@@ -56,12 +57,22 @@ player.onplay = () => {
 };
 player.onresize = () => {
   console.log('onresize');
-  const { width } = player.getBoundingClientRect();
-  barrage.resize(width);
+  resizeDanmu();
 };
 player.onseeked = () => {
   barrage.clear();
 };
+
+resizeDanmu();
+
+function resizeDanmu() {
+  const { width, height } = player.getBoundingClientRect();
+  danmu.width = width;
+  danmu.height = height;
+  danmu.style.width = width + 'px';
+  danmu.style.height = height + 'px';
+  barrage.resize(width);
+}
 
 new Vue({
   el: '#dashboard',
