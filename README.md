@@ -1,5 +1,8 @@
-# <center>A-Barrage</center>
-<center>基于Canvas渲染的高性能JavaScript弹幕库</center>
+# <p align="center">A-Barrage</p>
+<p align="center">基于Canvas渲染的高性能JavaScript弹幕库</p>
+
+## 🎦 Live Demo
+https://logcas.github.io/a-barrage/example/
 
 ## 🧐 如何使用
 
