@@ -40,3 +40,10 @@ export interface TrackManagerMap {
 }
 
 export type TrackManagerMapKey = keyof TrackManagerMap
+
+export interface CommanderConfig {
+  trackWidth: number
+  trackHeight: number
+  duration: number
+  maxTrack: number
+}
