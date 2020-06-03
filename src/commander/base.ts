@@ -42,7 +42,7 @@ export default abstract class BaseCommander<T extends BarrageObject> {
   // 寻找合适的轨道
   abstract _findTrack(): number
   // 从等待队列中抽取弹幕并放入弹幕
-  abstract _extractBarrage(): boolean
+  abstract _extractBarrage(): void
   // 渲染函数
   abstract render(): void
 }
