@@ -8,9 +8,9 @@ import {
 } from './types'
 import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from './helper'
 import EventEmitter from './event-emitter'
-import { HTML_ELEMENT_NATIVE_EVENTS } from './constants'
 import { getEngine } from './commander'
 import BaseCommander from './commander/base'
+import { injectNativeEvents, injectEventsDelegator } from './event'
 
 const defaultConfig: BarrageConfig = {
   engine: 'canvas',
@@ -71,8 +71,10 @@ export default class BarrageMaker extends EventEmitter {
     }
 
     this.resize()
-    this._bindNativeEvents()
-    this._delegateEvents()
+
+    // 注入事件控制逻辑
+    injectNativeEvents(this)
+    injectEventsDelegator(this)
   }
 
   resize(width?: number) {
@@ -158,49 +160,5 @@ export default class BarrageMaker extends EventEmitter {
     this._forEachManager(manager => manager.render())
 
     this.animation = requestAnimationFrame(this._render.bind(this))
-  }
-
-  _bindNativeEvents() {
-    HTML_ELEMENT_NATIVE_EVENTS.map(eventName => {
-      this.canvas.addEventListener(eventName, event => {
-        this.$emit(eventName, event)
-      })
-    })
-  }
-
-  _delegateEvents() {
-    const proxyObject = this.config.proxyObject
-    if (!(proxyObject instanceof HTMLElement)) {
-      return
-    }
-    type MouseEventName =
-      | 'click'
-      | 'dblclick'
-      | 'mousedown'
-      | 'mousemove'
-      | 'mouseout'
-      | 'mouseover'
-      | 'mouseup'
-    HTML_ELEMENT_NATIVE_EVENTS.map(eventName => {
-      this.canvas.addEventListener(eventName as MouseEventName, (e: MouseEvent) => {
-        const event = new MouseEvent(eventName, {
-          view: window,
-          relatedTarget: proxyObject,
-          altKey: e.altKey,
-          button: e.button,
-          buttons: e.buttons,
-          clientX: e.clientX,
-          clientY: e.clientY,
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          movementX: e.movementX,
-          movementY: e.movementY,
-          screenX: e.screenX,
-          screenY: e.screenY,
-          shiftKey: e.shiftKey
-        })
-        proxyObject.dispatchEvent(event)
-      })
-    })
   }
 }
