@@ -6,11 +6,12 @@ import {
   ScrollBarrageObject,
   FixedBarrageObejct
 } from './types'
-import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from './helper'
+import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge, isCanvas } from './helper'
 import EventEmitter from './event-emitter'
 import { getEngine } from './commander'
 import BaseCommander from './commander/base'
 import { injectNativeEvents, injectEventsDelegator } from './event'
+import { getHandler, FnMap } from './stragy'
 
 const defaultConfig: BarrageConfig = {
   engine: 'canvas',
@@ -27,38 +28,35 @@ const defaultConfig: BarrageConfig = {
 type BarrageConfigInit = Partial<BarrageConfig>
 
 export default class BarrageMaker extends EventEmitter {
-  canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
+  el: HTMLDivElement | HTMLCanvasElement
+  canvas: HTMLCanvasElement | null = null
+  ctx: CanvasRenderingContext2D | null = null
   config: BarrageConfig
   commanderMap: CommanderMap
   animation: number | null = null
 
-  constructor(el: HTMLElement | string, config?: BarrageConfigInit) {
+  constructor(el: HTMLDivElement | HTMLCanvasElement | string, config?: BarrageConfigInit) {
     super()
 
-    const canvas = getEl(el)
-    if (!canvas) {
-      throw new Error('wrapper is not a HTMLElement')
-    }
-
-    if (!(canvas instanceof HTMLCanvasElement)) {
-      throw new Error('el must be a HTMLCanvasElement!')
-    }
-
-    this.canvas = canvas
-    this.ctx = this.canvas.getContext('2d')!
     this.config = deepMerge(defaultConfig, config || {})
+
+    this.el = getEl(el, this.config.engine)
+
+    if (isCanvas(this.el)) {
+      this.canvas = this.el
+      this.ctx = this.canvas.getContext('2d')!
+    }
 
     // 兼容性：IE11+ / 非IE基本全支持
     // pointer-events 避免上层canvas阻碍下层点击
     if (this.config.usePointerEvents) {
-      this.canvas.style.pointerEvents = 'none'
+      this.el.style.pointerEvents = 'none'
     }
 
     // 获取渲染引擎
     const renderEngine = getEngine(this.config.engine)!
     const commanderConfig = {
-      trackWidth: this.canvas.width,
+      trackWidth: this.el.offsetWidth,
       trackHeight: this.config.trackHeight,
       maxTrack: this.config.maxTrack,
       duration: this.config.duration
@@ -78,18 +76,17 @@ export default class BarrageMaker extends EventEmitter {
   }
 
   resize(width?: number) {
-    width = width || this.canvas.width
+    width = width || this.el.offsetWidth
     this._forEachManager(manager => manager.resize(width))
   }
 
   clear() {
-    const { width, height } = this.canvas
-    this._forEachManager(manager => manager.reset())
-    this.ctx.clearRect(0, 0, width, height)
+    const fn = getHandler(this.config.engine, 'clear') as FnMap['clear']
+    return fn.call(this)
   }
 
   setOpacity(opacity: number = 1) {
-    this.canvas.style.opacity = `${opacity}`
+    this.el.style.opacity = `${opacity}`
   }
 
   setFontSize(zoom: number = 1) {
@@ -97,34 +94,8 @@ export default class BarrageMaker extends EventEmitter {
   }
 
   add(barrage: RawBarrageObject, type: CommanderMapKey = 'scroll') {
-    const { text, color, size } = barrage
-    const ctx = this.ctx
-    const fontSize = (size || this.config.fontSize) * this.config.zoom
-    const fontColor = color || this.config.fontColor
-
-    ctx.font = `${fontSize}px 'Microsoft Yahei'`
-    const { width } = ctx.measureText(text)
-    if (type === 'scroll') {
-      const barrageObject: ScrollBarrageObject = {
-        text,
-        width,
-        color: fontColor,
-        size: fontSize,
-        speed: 0,
-        offset: 0
-      }
-      this.commanderMap[type].waitingQueue.push(barrageObject)
-    } else {
-      const barrageObject: FixedBarrageObejct = {
-        text,
-        width,
-        color: fontColor,
-        size: fontSize,
-        duration: 0,
-        offset: 0
-      }
-      this.commanderMap[type].waitingQueue.push(barrageObject)
-    }
+    const fn = getHandler(this.config.engine, 'add') as FnMap['add']
+    return fn.call(this, barrage, type)
   }
 
   start() {
@@ -153,12 +124,7 @@ export default class BarrageMaker extends EventEmitter {
   }
 
   _render() {
-    const ctx = this.ctx
-    ctx.shadowBlur = 2
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)'
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-    this._forEachManager(manager => manager.render())
-
-    this.animation = requestAnimationFrame(this._render.bind(this))
+    const fn = getHandler(this.config.engine, '_render') as FnMap['_render']
+    return fn.call(this)
   }
 }

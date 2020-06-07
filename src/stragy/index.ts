@@ -1,28 +1,16 @@
-import { BARRAGE_TYPE } from '../constants'
-import scrollStragies from './scroll'
-import fixedStragies from './fixed'
-import globalStragies from './global'
+import { RawBarrageObject, CommanderMapKey } from '../types'
+import CanvasStragy from './canvas'
+import Css3Stragy from './css3'
 
-export const addBarrageStragy: any = {
-  [BARRAGE_TYPE.SCROLL]: scrollStragies.add,
-  [BARRAGE_TYPE.FIXED_TOP]: fixedStragies.add,
-  [BARRAGE_TYPE.FIXED_BOTTOM]: fixedStragies.add
+export interface FnMap {
+  clear(): void
+  add(barrage: RawBarrageObject, type: CommanderMapKey): void
+  _render(): void
 }
 
-export const findTrackStragy: any = {
-  [BARRAGE_TYPE.SCROLL]: scrollStragies.find,
-  [BARRAGE_TYPE.FIXED_TOP]: fixedStragies.find,
-  [BARRAGE_TYPE.FIXED_BOTTOM]: fixedStragies.find
-}
+type FnMapKey = keyof FnMap
 
-export const pushBarrageStragy: any = {
-  [BARRAGE_TYPE.SCROLL]: globalStragies.push,
-  [BARRAGE_TYPE.FIXED_BOTTOM]: globalStragies.push,
-  [BARRAGE_TYPE.FIXED_TOP]: globalStragies.push
-}
-
-export const renderBarrageStragy: any = {
-  [BARRAGE_TYPE.SCROLL]: scrollStragies.render,
-  [BARRAGE_TYPE.FIXED_TOP]: fixedStragies.renderTop,
-  [BARRAGE_TYPE.FIXED_BOTTOM]: fixedStragies.renderBottom
+export function getHandler(engine: 'canvas' | 'css3', fn: FnMapKey) {
+  const fnMap: FnMap = engine === 'canvas' ? CanvasStragy : Css3Stragy
+  return fnMap[fn]
 }

@@ -8,11 +8,33 @@ export function getArrayRight<T>(array: T[]): T {
   return array[array.length - 1]
 }
 
-export function getEl(el: HTMLElement | string): HTMLElement | null {
-  if (el instanceof HTMLElement) {
-    return el
+export function isDiv(el: any): el is HTMLDivElement {
+  return el instanceof HTMLDivElement
+}
+
+export function isCanvas(el: any): el is HTMLCanvasElement {
+  return el instanceof HTMLCanvasElement
+}
+
+export function getEl(
+  el: HTMLDivElement | HTMLCanvasElement | string,
+  type: 'css3' | 'canvas'
+): HTMLDivElement | HTMLCanvasElement {
+  const $ = document.querySelector
+  let _el = typeof el === 'string' ? $(el) : el
+  if (type === 'canvas' && !isCanvas(_el)) {
+    throwElError('canvas')
   }
-  return document.querySelector(el)
+  if (type === 'css3' && !isDiv(_el)) {
+    throwElError('css3')
+  }
+
+  return _el as HTMLCanvasElement | HTMLDivElement
+
+  function throwElError(type: 'canvas' | 'css3'): never {
+    const EL_TYPE = type === 'canvas' ? 'HTMLCanvasElement' : 'HTMLDivElement'
+    throw new Error(`Engine Error: el is not a ${EL_TYPE} instance.(engine: ${type})`)
+  }
 }
 
 export const requestAnimationFrame =
