@@ -1,7 +1,12 @@
 import BaseFixedCommander from './base-fixed'
 import { TIME_PER_FRAME } from '../../constants'
+import { CommanderConfig } from '../../types'
 
 export default class FixedTopCommander extends BaseFixedCommander {
+  constructor(canvas: HTMLCanvasElement, config: CommanderConfig) {
+    super(canvas, config)
+  }
+
   render(): void {
     this._extractBarrage()
     const ctx = this.ctx

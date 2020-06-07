@@ -1,17 +1,19 @@
 import {
   BarrageConfig,
   RawBarrageObject,
-  TrackManagerMap,
-  TrackManagerMapKey,
+  CommanderMap,
+  CommanderMapKey,
   ScrollBarrageObject,
   FixedBarrageObejct
 } from './types'
-import TrackManager from './track-manager'
 import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge } from './helper'
 import EventEmitter from './event-emitter'
 import { HTML_ELEMENT_NATIVE_EVENTS } from './constants'
+import { getEngine } from './commander'
+import BaseCommander from './commander/base'
 
 const defaultConfig: BarrageConfig = {
+  engine: 'canvas',
   zoom: 1,
   proxyObject: null,
   usePointerEvents: true,
@@ -28,7 +30,7 @@ export default class BarrageMaker extends EventEmitter {
   canvas: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   config: BarrageConfig
-  trackManagerMap: TrackManagerMap
+  commanderMap: CommanderMap
   animation: number | null = null
 
   constructor(el: HTMLElement | string, config?: BarrageConfigInit) {
@@ -53,28 +55,19 @@ export default class BarrageMaker extends EventEmitter {
       this.canvas.style.pointerEvents = 'none'
     }
 
-    this.trackManagerMap = {
-      scroll: new TrackManager<ScrollBarrageObject>(this.canvas, {
-        trackWidth: this.canvas.width,
-        trackHeight: this.config.trackHeight,
-        numbersOfTrack: this.config.maxTrack,
-        duration: this.config.duration,
-        type: 'scroll'
-      }),
-      'fixed-top': new TrackManager<FixedBarrageObejct>(this.canvas, {
-        trackWidth: this.canvas.width,
-        trackHeight: this.config.trackHeight,
-        numbersOfTrack: this.config.maxTrack,
-        duration: this.config.duration,
-        type: 'fixed-top'
-      }),
-      'fixed-bottom': new TrackManager<FixedBarrageObejct>(this.canvas, {
-        trackWidth: this.canvas.width,
-        trackHeight: this.config.trackHeight,
-        numbersOfTrack: this.config.maxTrack,
-        duration: this.config.duration,
-        type: 'fixed-bottom'
-      })
+    // 获取渲染引擎
+    const renderEngine = getEngine(this.config.engine)!
+    const commanderConfig = {
+      trackWidth: this.canvas.width,
+      trackHeight: this.config.trackHeight,
+      maxTrack: this.config.maxTrack,
+      duration: this.config.duration
+    }
+
+    this.commanderMap = {
+      scroll: new renderEngine.RollingCommander(this.canvas, commanderConfig),
+      'fixed-top': new renderEngine.FixedTopCommander(this.canvas, commanderConfig),
+      'fixed-bottom': new renderEngine.FixedBottomCommander(this.canvas, commanderConfig)
     }
 
     this.resize()
@@ -101,7 +94,7 @@ export default class BarrageMaker extends EventEmitter {
     this.config.zoom = zoom
   }
 
-  add(barrage: RawBarrageObject, type: TrackManagerMapKey = 'scroll') {
+  add(barrage: RawBarrageObject, type: CommanderMapKey = 'scroll') {
     const { text, color, size } = barrage
     const ctx = this.ctx
     const fontSize = (size || this.config.fontSize) * this.config.zoom
@@ -118,7 +111,7 @@ export default class BarrageMaker extends EventEmitter {
         speed: 0,
         offset: 0
       }
-      this.trackManagerMap[type].waitingQueue.push(barrageObject)
+      this.commanderMap[type].waitingQueue.push(barrageObject)
     } else {
       const barrageObject: FixedBarrageObejct = {
         text,
@@ -128,7 +121,7 @@ export default class BarrageMaker extends EventEmitter {
         duration: 0,
         offset: 0
       }
-      this.trackManagerMap[type].waitingQueue.push(barrageObject)
+      this.commanderMap[type].waitingQueue.push(barrageObject)
     }
   }
 
@@ -149,11 +142,11 @@ export default class BarrageMaker extends EventEmitter {
 
   _forEachManager(
     handler: (
-      trackManager: TrackManager<ScrollBarrageObject> | TrackManager<FixedBarrageObejct>
+      commander: BaseCommander<ScrollBarrageObject> | BaseCommander<FixedBarrageObejct>
     ) => any
   ) {
-    Object.keys(this.trackManagerMap).forEach(key =>
-      handler.call(this, this.trackManagerMap[key as TrackManagerMapKey])
+    Object.keys(this.commanderMap).forEach(key =>
+      handler.call(this, this.commanderMap[key as CommanderMapKey])
     )
   }
 

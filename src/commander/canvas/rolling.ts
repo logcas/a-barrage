@@ -1,10 +1,14 @@
 import BaseCanvasCommander from './base-canvas'
-import { ScrollBarrageObject } from '../../types'
+import { ScrollBarrageObject, CommanderConfig } from '../../types'
 import { isEmptyArray, getArrayRight } from '../../helper'
 import { TIME_PER_FRAME } from '../../constants'
 import Track from '../../track'
 
 export default class RollingCommander extends BaseCanvasCommander<ScrollBarrageObject> {
+  constructor(canvas: HTMLCanvasElement, config: CommanderConfig) {
+    super(canvas, config)
+  }
+
   private get _defaultSpeed(): number {
     return (this.trackWidth / this.duration) * TIME_PER_FRAME
   }

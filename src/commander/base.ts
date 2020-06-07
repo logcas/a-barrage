@@ -1,7 +1,7 @@
-import { BarrageObject } from '../types'
+import { BarrageObject, CommanderConfig } from '../types'
 import Track from '../track'
 
-interface TrackManagerForEachHandler<T extends BarrageObject> {
+interface CommanderForEachHandler<T extends BarrageObject> {
   (track: Track<T>, index: number, array: Track<T>[]): void
 }
 
@@ -12,13 +12,17 @@ export default abstract class BaseCommander<T extends BarrageObject> {
   protected tracks: Track<T>[] = []
   waitingQueue: T[] = []
 
-  constructor(trackWidth: number, trackHeight: number, duration: number) {
-    this.trackWidth = trackWidth
-    this.trackHeight = trackHeight
-    this.duration = duration
+  constructor(config: CommanderConfig) {
+    this.trackWidth = config.trackWidth
+    this.trackHeight = config.trackHeight
+    this.duration = config.duration
+
+    for (let i = 0; i < config.maxTrack; ++i) {
+      this.tracks[i] = new Track()
+    }
   }
 
-  forEach(handler: TrackManagerForEachHandler<T>) {
+  forEach(handler: CommanderForEachHandler<T>) {
     for (let i = 0; i < this.tracks.length; ++i) {
       handler(this.tracks[i], i, this.tracks)
     }

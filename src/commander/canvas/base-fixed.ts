@@ -1,8 +1,12 @@
 import BaseCanvasCommander from './base-canvas'
-import { FixedBarrageObejct } from '../../types'
+import { FixedBarrageObejct, CommanderConfig } from '../../types'
 import { isEmptyArray } from '../../helper'
 
 export default abstract class BaseFixedCommander extends BaseCanvasCommander<FixedBarrageObejct> {
+  constructor(canvas: HTMLCanvasElement, config: CommanderConfig) {
+    super(canvas, config)
+  }
+
   add(barrage: FixedBarrageObejct): boolean {
     const trackId = this._findTrack()
     if (trackId === -1) {
