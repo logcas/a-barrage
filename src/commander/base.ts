@@ -10,6 +10,7 @@ export default abstract class BaseCommander<T extends BarrageObject> extends Eve
   protected trackWidth: number
   protected trackHeight: number
   protected duration: number
+  protected maxTrack: number
   protected tracks: Track<T>[] = []
   waitingQueue: T[] = []
 
@@ -18,6 +19,7 @@ export default abstract class BaseCommander<T extends BarrageObject> extends Eve
     this.trackWidth = config.trackWidth
     this.trackHeight = config.trackHeight
     this.duration = config.duration
+    this.maxTrack = config.maxTrack
 
     for (let i = 0; i < config.maxTrack; ++i) {
       this.tracks[i] = new Track()

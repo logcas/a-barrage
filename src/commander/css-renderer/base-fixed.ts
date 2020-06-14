@@ -5,8 +5,12 @@ import { isEmptyArray } from '../../helper'
 import { createBarrage, appendChild } from '../../helper/css'
 
 export default abstract class BaseFixedCssCommander extends BaseCssCommander<FixedBarrageObejct> {
+  protected elHeight: number
+
   constructor(el: HTMLDivElement, config: CommanderConfig) {
     super(el, config)
+
+    this.elHeight = el.offsetHeight
   }
 
   add(barrage: FixedBarrageObejct): boolean {
