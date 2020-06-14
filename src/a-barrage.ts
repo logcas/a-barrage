@@ -127,26 +127,22 @@ export default class BarrageMaker extends EventEmitter {
   }
 
   onBarrageHover(handler: BarrageMouseEventHandler) {
-    if (this.config.engine === 'css3') {
-      this.commanderMap['scroll'].$on('hover', handler)
-      this.commanderMap['fixed-top'].$on('hover', handler)
-      this.commanderMap['fixed-bottom'].$on('hover', handler)
-    }
+    this._bindBarrageEvent('hover', handler)
   }
 
   onBarrageBlur(handler: BarrageMouseEventHandler) {
-    if (this.config.engine === 'css3') {
-      this.commanderMap['scroll'].$on('blur', handler)
-      this.commanderMap['fixed-top'].$on('blur', handler)
-      this.commanderMap['fixed-bottom'].$on('blur', handler)
-    }
+    this._bindBarrageEvent('blur', handler)
   }
 
   onBarrageClick(handler: BarrageMouseEventHandler) {
+    this._bindBarrageEvent('click', handler)
+  }
+
+  _bindBarrageEvent(eventName: string, handler: BarrageMouseEventHandler) {
     if (this.config.engine === 'css3') {
-      this.commanderMap['scroll'].$on('click', handler)
-      this.commanderMap['fixed-top'].$on('click', handler)
-      this.commanderMap['fixed-bottom'].$on('click', handler)
+      this.commanderMap['scroll'].$on(eventName, handler)
+      this.commanderMap['fixed-top'].$on(eventName, handler)
+      this.commanderMap['fixed-bottom'].$on(eventName, handler)
     }
   }
 
