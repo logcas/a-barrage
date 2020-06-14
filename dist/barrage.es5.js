@@ -62,8 +62,8 @@ var isNull = function (o) {
 var isUndefined = function (o) {
     return typeof o === 'undefined';
 };
-var isObject = function (o) {
-    return typeof o === 'object' && o !== null;
+var isPlainObject = function (o) {
+    return Object.prototype.toString.call(o) === '[object Object]';
 };
 function deepMerge() {
     var objects = [];
@@ -83,7 +83,7 @@ function deepMerge() {
                 if (Array.isArray(obj[key])) {
                     ret[key] = obj[key];
                 }
-                else if (isObject(obj[key])) {
+                else if (isPlainObject(obj[key])) {
                     ret[key] = deepMerge(ret[key], obj[key]);
                 }
                 else {
@@ -180,6 +180,12 @@ var BarrageTrack = /** @class */ (function () {
     BarrageTrack.prototype.removeTop = function () {
         this.barrages.shift();
     };
+    BarrageTrack.prototype.remove = function (index) {
+        if (index < 0 || index >= this.barrages.length) {
+            return;
+        }
+        this.barrages.splice(index, 1);
+    };
     BarrageTrack.prototype.updateOffset = function () {
         var endBarrage = this.barrages[this.barrages.length - 1];
         if (endBarrage && isScrollBarrage(endBarrage)) {
@@ -191,25 +197,29 @@ var BarrageTrack = /** @class */ (function () {
 }());
 //# sourceMappingURL=track.js.map
 
-var BaseCommander = /** @class */ (function () {
+var BaseCommander = /** @class */ (function (_super) {
+    __extends(BaseCommander, _super);
     function BaseCommander(config) {
-        this.tracks = [];
-        this.waitingQueue = [];
-        this.trackWidth = config.trackWidth;
-        this.trackHeight = config.trackHeight;
-        this.duration = config.duration;
+        var _this = _super.call(this) || this;
+        _this.tracks = [];
+        _this.waitingQueue = [];
+        _this.trackWidth = config.trackWidth;
+        _this.trackHeight = config.trackHeight;
+        _this.duration = config.duration;
+        _this.maxTrack = config.maxTrack;
         for (var i = 0; i < config.maxTrack; ++i) {
-            this.tracks[i] = new BarrageTrack();
+            _this.tracks[i] = new BarrageTrack();
         }
+        return _this;
     }
     BaseCommander.prototype.forEach = function (handler) {
         for (var i = 0; i < this.tracks.length; ++i) {
             handler(this.tracks[i], i, this.tracks);
         }
     };
-    BaseCommander.prototype.reset = function () {
-        this.forEach(function (track) { return track.reset(); });
-    };
+    // reset() {
+    //   this.forEach(track => track.reset())
+    // }
     BaseCommander.prototype.resize = function (width, height) {
         if (width) {
             this.trackWidth = width;
@@ -219,7 +229,7 @@ var BaseCommander = /** @class */ (function () {
         }
     };
     return BaseCommander;
-}());
+}(EventEmitter));
 //# sourceMappingURL=base.js.map
 
 var BaseCanvasCommander = /** @class */ (function (_super) {
@@ -230,6 +240,9 @@ var BaseCanvasCommander = /** @class */ (function (_super) {
         _this.ctx = canvas.getContext('2d');
         return _this;
     }
+    BaseCanvasCommander.prototype.reset = function () {
+        this.forEach(function (track) { return track.reset(); });
+    };
     return BaseCanvasCommander;
 }(BaseCommander));
 //# sourceMappingURL=base-canvas.js.map
@@ -445,15 +458,103 @@ var engine = {
 };
 //# sourceMappingURL=index.js.map
 
+function createElement(tagName) {
+    return document.createElement(tagName);
+}
+function createBarrage(text, color, fontSize, left) {
+    var danmu = createElement('div');
+    setStyle(danmu, {
+        position: 'absolute',
+        color: color,
+        fontSize: fontSize,
+        transform: "translateX(" + left + "px)",
+        textShadow: '#000 1px 0 0, #000 0 1px 0, #000 -1px 0 0, #000 0 -1px 0',
+        pointerEvents: 'auto',
+        padding: '3px 20px',
+        borderRadius: '20px',
+        backgroundColor: 'transparent',
+        cursor: 'pointer'
+    });
+    danmu.textContent = text;
+    return danmu;
+}
+function appendChild(parent, child) {
+    return parent.appendChild(child);
+}
+function setStyle(el, style) {
+    for (var key in style) {
+        el.style[key] = style[key];
+    }
+}
+function setHoverStyle(el) {
+    el.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+}
+function setUnhoverStyle(el) {
+    el.style.backgroundColor = 'transparent';
+}
+//# sourceMappingURL=css.js.map
+
 var BaseCssCommander = /** @class */ (function (_super) {
     __extends(BaseCssCommander, _super);
     function BaseCssCommander(el, config) {
         var _this = _super.call(this, config) || this;
+        _this.objToElm = new WeakMap();
+        _this.elmToObj = new WeakMap();
+        _this.freezeBarrage = null;
         _this.el = el;
+        var wrapper = config.wrapper;
+        if (wrapper) {
+            wrapper.addEventListener('mousemove', _this._mouseMoveEventHandler.bind(_this));
+            wrapper.addEventListener('click', _this._mouseClickEventHandler.bind(_this));
+        }
         return _this;
     }
     BaseCssCommander.prototype.removeElement = function (target) {
         this.el.removeChild(target);
+    };
+    BaseCssCommander.prototype._mouseMoveEventHandler = function (e) {
+        var target = e.target;
+        if (!target) {
+            return;
+        }
+        var newFreezeBarrage = this.elmToObj.get(target);
+        var oldFreezeBarrage = this.freezeBarrage;
+        if (newFreezeBarrage === oldFreezeBarrage) {
+            return;
+        }
+        this.freezeBarrage = null;
+        if (newFreezeBarrage) {
+            this.freezeBarrage = newFreezeBarrage;
+            newFreezeBarrage.freeze = true;
+            setHoverStyle(target);
+            this.$emit('hover', newFreezeBarrage, target);
+        }
+        if (oldFreezeBarrage) {
+            oldFreezeBarrage.freeze = false;
+            var oldFreezeElm = this.objToElm.get(oldFreezeBarrage);
+            oldFreezeElm && setUnhoverStyle(oldFreezeElm);
+            this.$emit('blur', oldFreezeBarrage, oldFreezeElm);
+        }
+    };
+    BaseCssCommander.prototype._mouseClickEventHandler = function (e) {
+        var target = e.target;
+        var barrageObject = this.elmToObj.get(target);
+        if (barrageObject) {
+            this.$emit('click', barrageObject, target);
+        }
+    };
+    BaseCssCommander.prototype.reset = function () {
+        var _this = this;
+        this.forEach(function (track) {
+            track.forEach(function (barrage) {
+                var el = _this.objToElm.get(barrage);
+                if (!el) {
+                    return;
+                }
+                _this.removeElement(el);
+            });
+            track.reset();
+        });
     };
     return BaseCssCommander;
 }(BaseCommander));
@@ -463,8 +564,7 @@ var BaseFixedCssCommander = /** @class */ (function (_super) {
     __extends(BaseFixedCssCommander, _super);
     function BaseFixedCssCommander(el, config) {
         var _this = _super.call(this, el, config) || this;
-        // FixedBarrageObejct ---> HTML 的映射
-        _this.objToElm = new WeakMap();
+        _this.elHeight = el.offsetHeight;
         return _this;
     }
     BaseFixedCssCommander.prototype.add = function (barrage) {
@@ -472,14 +572,24 @@ var BaseFixedCssCommander = /** @class */ (function (_super) {
         if (trackId === -1) {
             return false;
         }
+        // 创建弹幕DOM
+        var text = barrage.text, size = barrage.size, color = barrage.color, offset = barrage.offset;
+        var fontSize = size + 'px';
+        var posLeft = offset + 'px';
+        var danmu = createBarrage(text, color, fontSize, posLeft);
+        appendChild(this.el, danmu);
+        var width = danmu.offsetWidth;
+        // 计算位置
         var track = this.tracks[trackId];
         var trackWidth = this.trackWidth;
-        var width = barrage.width;
         var barrageOffset = (trackWidth - width) / 2;
         var normalizedBarrage = Object.assign({}, barrage, {
             offset: barrageOffset,
-            duration: this.duration
+            duration: this.duration,
+            width: width
         });
+        this.objToElm.set(normalizedBarrage, danmu);
+        this.elmToObj.set(danmu, normalizedBarrage);
         track.push(normalizedBarrage);
         return true;
     };
@@ -510,35 +620,12 @@ var BaseFixedCssCommander = /** @class */ (function (_super) {
         }
         var el = this.objToElm.get(barrage);
         this.objToElm.delete(barrage);
+        this.elmToObj.delete(el);
         this.removeElement(el);
     };
     return BaseFixedCssCommander;
 }(BaseCssCommander));
 //# sourceMappingURL=base-fixed.js.map
-
-function createElement(tagName) {
-    return document.createElement(tagName);
-}
-function createBarrage(text, color, fontSize, left) {
-    var danmu = createElement('div');
-    setStyle(danmu, {
-        position: 'absolute',
-        color: color,
-        fontSize: fontSize,
-        transform: "translateX(" + left + "px)"
-    });
-    danmu.textContent = text;
-    return danmu;
-}
-function appendChild(parent, child) {
-    return parent.appendChild(child);
-}
-function setStyle(el, style) {
-    for (var key in style) {
-        el.style[key] = style[key];
-    }
-}
-//# sourceMappingURL=css.js.map
 
 var FixedTopCommander$1 = /** @class */ (function (_super) {
     __extends(FixedTopCommander, _super);
@@ -550,25 +637,25 @@ var FixedTopCommander$1 = /** @class */ (function (_super) {
         this._extractBarrage();
         var objToElm = this.objToElm;
         var trackHeight = this.trackHeight;
-        this.tracks.forEach(function (track, index) {
+        this.tracks.forEach(function (track, trackIndex) {
             var barrage = track.barrages[0];
             if (!barrage) {
                 return;
             }
             var el = objToElm.get(barrage);
             if (!el) {
-                var text = barrage.text, color = barrage.color, size = barrage.size;
-                el = createBarrage(text, color, size + 'px', '50%');
-                var y = index * trackHeight + 'px';
-                el.style.transform = "translate(-50%, " + y + ")";
-                objToElm.set(barrage, el);
+                return;
             }
-            else {
-                barrage.duration -= TIME_PER_FRAME;
-                if (barrage.duration <= 0) {
-                    _this._removeTopElementFromTrack(track);
-                    track.removeTop();
-                }
+            if (barrage.freeze) {
+                return;
+            }
+            var offset = barrage.offset;
+            var y = trackIndex * trackHeight;
+            el.style.transform = "translate(" + offset + "px, " + y + "px)";
+            barrage.duration -= TIME_PER_FRAME;
+            if (barrage.duration <= 0) {
+                _this._removeTopElementFromTrack(track);
+                track.removeTop();
             }
         });
     };
@@ -579,10 +666,7 @@ var FixedTopCommander$1 = /** @class */ (function (_super) {
 var RollingCssCommander = /** @class */ (function (_super) {
     __extends(RollingCssCommander, _super);
     function RollingCssCommander(el, config) {
-        var _this = _super.call(this, el, config) || this;
-        // ScrollBarrageObject ---> HTML 的映射
-        _this.objToElm = new WeakMap();
-        return _this;
+        return _super.call(this, el, config) || this;
     }
     Object.defineProperty(RollingCssCommander.prototype, "_defaultSpeed", {
         get: function () {
@@ -629,6 +713,7 @@ var RollingCssCommander = /** @class */ (function (_super) {
             width: width
         });
         this.objToElm.set(normalizedBarrage, danmu);
+        this.elmToObj.set(danmu, normalizedBarrage);
         track.push(normalizedBarrage);
         track.offset = trackWidth + normalizedBarrage.width * 1.2;
         return true;
@@ -666,41 +751,87 @@ var RollingCssCommander = /** @class */ (function (_super) {
         var objToElm = this.objToElm;
         var trackHeight = this.trackHeight;
         this.forEach(function (track, trackIndex) {
-            var removeTop = false;
+            var shouldRemove = false;
+            var shouldRemoveIndex = -1;
             track.forEach(function (barrage, barrageIndex) {
                 if (!objToElm.has(barrage)) {
+                    return;
+                }
+                if (barrage.freeze) {
                     return;
                 }
                 var el = objToElm.get(barrage);
                 var offset = barrage.offset;
                 el.style.transform = "translate(" + offset + "px, " + trackIndex * trackHeight + "px)";
                 barrage.offset -= barrage.speed;
-                if (barrageIndex === 0 && barrage.offset < 0 && Math.abs(barrage.offset) > barrage.width) {
-                    removeTop = true;
+                if (barrage.offset < 0 && Math.abs(barrage.offset) > barrage.width) {
+                    shouldRemove = true;
+                    shouldRemoveIndex = barrageIndex;
                 }
             });
             track.updateOffset();
-            if (removeTop) {
-                _this._removeTopElementFromTrack(track);
-                track.removeTop();
+            if (shouldRemove) {
+                _this._removeElementFromTrack(track, shouldRemoveIndex);
+                track.remove(shouldRemoveIndex);
             }
         });
     };
-    RollingCssCommander.prototype._removeTopElementFromTrack = function (track) {
-        var barrage = track.barrages[0];
+    RollingCssCommander.prototype._removeElementFromTrack = function (track, removedIndex) {
+        var barrage = track.barrages[removedIndex];
         if (!barrage) {
             return;
         }
         var el = this.objToElm.get(barrage);
         this.objToElm.delete(barrage);
+        this.elmToObj.delete(el);
         this.removeElement(el);
     };
     return RollingCssCommander;
 }(BaseCssCommander));
+//# sourceMappingURL=rolling.js.map
+
+var FixedTopCommander$2 = /** @class */ (function (_super) {
+    __extends(FixedTopCommander, _super);
+    function FixedTopCommander(el, config) {
+        return _super.call(this, el, config) || this;
+    }
+    FixedTopCommander.prototype.render = function () {
+        var _this = this;
+        this._extractBarrage();
+        var objToElm = this.objToElm;
+        var trackHeight = this.trackHeight;
+        var maxTrack = this.maxTrack;
+        var elHeight = this.el.offsetHeight;
+        var yBase = elHeight - maxTrack * trackHeight;
+        this.tracks.forEach(function (track, trackIndex) {
+            var barrage = track.barrages[0];
+            if (!barrage) {
+                return;
+            }
+            var el = objToElm.get(barrage);
+            if (!el) {
+                return;
+            }
+            if (barrage.freeze) {
+                return;
+            }
+            var offset = barrage.offset;
+            var y = yBase + trackIndex * trackHeight;
+            el.style.transform = "translate(" + offset + "px, " + y + "px)";
+            barrage.duration -= TIME_PER_FRAME;
+            if (barrage.duration <= 0) {
+                _this._removeTopElementFromTrack(track);
+                track.removeTop();
+            }
+        });
+    };
+    return FixedTopCommander;
+}(BaseFixedCssCommander));
+//# sourceMappingURL=fixed-bottom.js.map
 
 var engine$1 = {
     FixedTopCommander: FixedTopCommander$1,
-    FixedBottomCommander: FixedTopCommander$1,
+    FixedBottomCommander: FixedTopCommander$2,
     RollingCommander: RollingCssCommander
 };
 //# sourceMappingURL=index.js.map
@@ -730,6 +861,10 @@ function injectEventsDelegator(instance) {
     }
     HTML_ELEMENT_NATIVE_EVENTS.map(function (eventName) {
         instance.el.addEventListener(eventName, function (e) {
+            var target = e.target;
+            if (target !== instance.el) {
+                return;
+            }
             var event = new MouseEvent(eventName, {
                 view: window,
                 relatedTarget: proxyObject,
@@ -803,7 +938,9 @@ var CanvasStragy = {
 
 // import { createBarrage, appendChild } from '../helper/css';
 var Css3Stragy = {
-    clear: function () { },
+    clear: function () {
+        this._forEachManager(function (manager) { return manager.reset(); });
+    },
     add: function (barrage, type) {
         if (type === void 0) { type = 'scroll'; }
         var text = barrage.text, _a = barrage.color, color = _a === void 0 ? this.config.fontColor : _a, _b = barrage.size, size = _b === void 0 ? this.config.fontSize : _b;
@@ -824,6 +961,17 @@ var Css3Stragy = {
                 offset: trackWidth
             };
             // (this.commanderMap[type] as RollingCssCommander).objToElm.set(barrageObject, danmu);
+            this.commanderMap[type].waitingQueue.push(barrageObject);
+        }
+        else {
+            var barrageObject = {
+                text: text,
+                width: 0,
+                color: fontColor,
+                size: size,
+                duration: this.config.duration,
+                offset: trackWidth
+            };
             this.commanderMap[type].waitingQueue.push(barrageObject);
         }
     },
@@ -849,7 +997,8 @@ var defaultConfig = {
     fontSize: 20,
     fontColor: '#fff',
     duration: 10000,
-    trackHeight: 20 * 1.5
+    trackHeight: 20 * 1.5,
+    wrapper: null
 };
 var BarrageMaker = /** @class */ (function (_super) {
     __extends(BarrageMaker, _super);
@@ -859,6 +1008,7 @@ var BarrageMaker = /** @class */ (function (_super) {
         _this.ctx = null;
         _this.animation = null;
         _this.config = deepMerge(defaultConfig, config || {});
+        console.log(_this.config);
         _this.el = getEl(el, _this.config.engine);
         if (isCanvas(_this.el)) {
             _this.canvas = _this.el;
@@ -875,7 +1025,8 @@ var BarrageMaker = /** @class */ (function (_super) {
             trackWidth: _this.el.offsetWidth,
             trackHeight: _this.config.trackHeight,
             maxTrack: _this.config.maxTrack,
-            duration: _this.config.duration
+            duration: _this.config.duration,
+            wrapper: _this.config.wrapper
         };
         var rootEle = _this.config.engine === 'canvas' ? _this.canvas : _this.el;
         _this.commanderMap = {
@@ -923,6 +1074,22 @@ var BarrageMaker = /** @class */ (function (_super) {
         cancelAnimationFrame(this.animation);
         this.animation = null;
     };
+    BarrageMaker.prototype.onBarrageHover = function (handler) {
+        this._bindBarrageEvent('hover', handler);
+    };
+    BarrageMaker.prototype.onBarrageBlur = function (handler) {
+        this._bindBarrageEvent('blur', handler);
+    };
+    BarrageMaker.prototype.onBarrageClick = function (handler) {
+        this._bindBarrageEvent('click', handler);
+    };
+    BarrageMaker.prototype._bindBarrageEvent = function (eventName, handler) {
+        if (this.config.engine === 'css3') {
+            this.commanderMap['scroll'].$on(eventName, handler);
+            this.commanderMap['fixed-top'].$on(eventName, handler);
+            this.commanderMap['fixed-bottom'].$on(eventName, handler);
+        }
+    };
     BarrageMaker.prototype._forEachManager = function (handler) {
         var _this = this;
         Object.keys(this.commanderMap).forEach(function (key) {
@@ -935,7 +1102,6 @@ var BarrageMaker = /** @class */ (function (_super) {
     };
     return BarrageMaker;
 }(EventEmitter));
-//# sourceMappingURL=a-barrage.js.map
 
 export default BarrageMaker;
 //# sourceMappingURL=barrage.es5.js.map

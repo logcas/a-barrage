@@ -1,4 +1,4 @@
-import { BarrageConfig, RawBarrageObject, CommanderMap, CommanderMapKey, ScrollBarrageObject, FixedBarrageObejct } from './types';
+import { BarrageConfig, RawBarrageObject, CommanderMap, CommanderMapKey, ScrollBarrageObject, FixedBarrageObejct, BarrageMouseEventHandler } from './types';
 import EventEmitter from './event-emitter';
 import BaseCommander from './commander/base';
 declare type BarrageConfigInit = Partial<BarrageConfig>;
@@ -17,6 +17,10 @@ export default class BarrageMaker extends EventEmitter {
     add(barrage: RawBarrageObject, type?: CommanderMapKey): void;
     start(): void;
     stop(): void;
+    onBarrageHover(handler: BarrageMouseEventHandler): void;
+    onBarrageBlur(handler: BarrageMouseEventHandler): void;
+    onBarrageClick(handler: BarrageMouseEventHandler): void;
+    _bindBarrageEvent(eventName: string, handler: BarrageMouseEventHandler): void;
     _forEachManager(handler: (commander: BaseCommander<ScrollBarrageObject> | BaseCommander<FixedBarrageObejct>) => any): void;
     _render(): void;
 }
