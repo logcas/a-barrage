@@ -63,7 +63,6 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
   }
 
   reset() {
-    console.log('call reset')
     this.forEach(track => {
       track.forEach(barrage => {
         const el = this.objToElm.get(barrage)

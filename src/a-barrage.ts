@@ -7,14 +7,7 @@ import {
   FixedBarrageObejct,
   BarrageMouseEventHandler
 } from './types'
-import {
-  getEl,
-  requestAnimationFrame,
-  cancelAnimationFrame,
-  deepMerge,
-  isCanvas,
-  isDiv
-} from './helper'
+import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge, isCanvas } from './helper'
 import EventEmitter from './event-emitter'
 import { getEngine } from './commander'
 import BaseCommander from './commander/base'
