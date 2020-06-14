@@ -2,6 +2,7 @@ import BaseCssCommander from './base-css'
 import { CommanderConfig, FixedBarrageObejct } from '../../types'
 import Track from '../../track'
 import { isEmptyArray } from '../../helper'
+import { createBarrage, appendChild } from '../../helper/css'
 
 export default abstract class BaseFixedCssCommander extends BaseCssCommander<FixedBarrageObejct> {
   constructor(el: HTMLDivElement, config: CommanderConfig) {
@@ -13,15 +14,26 @@ export default abstract class BaseFixedCssCommander extends BaseCssCommander<Fix
     if (trackId === -1) {
       return false
     }
+    // 创建弹幕DOM
+    const { text, size, color, offset } = barrage
+    const fontSize = size + 'px'
+    let posLeft = offset + 'px'
+    const danmu = createBarrage(text, color, fontSize, posLeft)
+    appendChild(this.el, danmu)
+    const width = danmu.offsetWidth
 
+    // 计算位置
     const track = this.tracks[trackId]
     const trackWidth = this.trackWidth
-    const { width } = barrage
     const barrageOffset = (trackWidth - width) / 2
     const normalizedBarrage = Object.assign({}, barrage, {
       offset: barrageOffset,
-      duration: this.duration
+      duration: this.duration,
+      width
     })
+
+    this.objToElm.set(normalizedBarrage, danmu)
+    this.elmToObj.set(danmu, normalizedBarrage)
     track.push(normalizedBarrage)
     return true
   }
@@ -55,6 +67,7 @@ export default abstract class BaseFixedCssCommander extends BaseCssCommander<Fix
     }
     const el = this.objToElm.get(barrage)!
     this.objToElm.delete(barrage)
+    this.elmToObj.delete(el)
     this.removeElement(el)
   }
 }

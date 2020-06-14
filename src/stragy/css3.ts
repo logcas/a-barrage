@@ -1,5 +1,10 @@
 import BarrageMaker from '../a-barrage'
-import { RawBarrageObject, CommanderMapKey, ScrollBarrageObject } from '../types'
+import {
+  RawBarrageObject,
+  CommanderMapKey,
+  ScrollBarrageObject,
+  FixedBarrageObejct
+} from '../types'
 // import { createBarrage, appendChild } from '../helper/css';
 // import RollingCssCommander from '../commander/css-renderer/rolling';
 import { requestAnimationFrame } from '../helper'
@@ -28,6 +33,16 @@ export default {
         offset: trackWidth
       }
       // (this.commanderMap[type] as RollingCssCommander).objToElm.set(barrageObject, danmu);
+      this.commanderMap[type].waitingQueue.push(barrageObject)
+    } else {
+      const barrageObject: FixedBarrageObejct = {
+        text,
+        width: 0,
+        color: fontColor,
+        size,
+        duration: this.config.duration,
+        offset: trackWidth
+      }
       this.commanderMap[type].waitingQueue.push(barrageObject)
     }
   },
