@@ -3,14 +3,21 @@ import { ScrollBarrageObject, CommanderConfig } from '../../types'
 import { isEmptyArray, getArrayRight } from '../../helper'
 import { TIME_PER_FRAME } from '../../constants'
 import Track from '../../track'
-import { createBarrage, appendChild } from '../../helper/css'
+import { createBarrage, appendChild, setUnhoverStyle, setHoverStyle } from '../../helper/css'
 
 export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageObject> {
   // ScrollBarrageObject ---> HTML 的映射
   objToElm: WeakMap<ScrollBarrageObject, HTMLElement> = new WeakMap()
+  elmToObj: WeakMap<HTMLElement, ScrollBarrageObject> = new WeakMap()
+  freezeBarrage: ScrollBarrageObject | null = null
 
   constructor(el: HTMLDivElement, config: CommanderConfig) {
     super(el, config)
+
+    const wrapper = config.wrapper
+    if (wrapper) {
+      wrapper.addEventListener('mousemove', this._hoverEventHandler.bind(this))
+    }
   }
 
   private get _defaultSpeed(): number {
@@ -52,6 +59,7 @@ export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageO
       width
     })
     this.objToElm.set(normalizedBarrage, danmu)
+    this.elmToObj.set(danmu, normalizedBarrage)
     track.push(normalizedBarrage)
     track.offset = trackWidth + normalizedBarrage.width * 1.2
     return true
@@ -90,34 +98,70 @@ export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageO
     const objToElm = this.objToElm
     const trackHeight = this.trackHeight
     this.forEach((track: Track<ScrollBarrageObject>, trackIndex: number) => {
-      let removeTop = false
+      let shouldRemove = false
+      let shouldRemoveIndex = -1
       track.forEach((barrage, barrageIndex) => {
         if (!objToElm.has(barrage)) {
+          return
+        }
+        if (barrage.freeze) {
           return
         }
         const el = objToElm.get(barrage)!
         const offset = barrage.offset
         el.style.transform = `translate(${offset}px, ${trackIndex * trackHeight}px)`
         barrage.offset -= barrage.speed
-        if (barrageIndex === 0 && barrage.offset < 0 && Math.abs(barrage.offset) > barrage.width) {
-          removeTop = true
+        if (barrage.offset < 0 && Math.abs(barrage.offset) > barrage.width) {
+          shouldRemove = true
+          shouldRemoveIndex = barrageIndex
         }
       })
       track.updateOffset()
-      if (removeTop) {
-        this._removeTopElementFromTrack(track)
-        track.removeTop()
+      if (shouldRemove) {
+        this._removeElementFromTrack(track, shouldRemoveIndex)
+        track.remove(shouldRemoveIndex)
       }
     })
   }
 
-  _removeTopElementFromTrack(track: Track<ScrollBarrageObject>) {
-    const barrage = track.barrages[0]
+  _removeElementFromTrack(track: Track<ScrollBarrageObject>, removedIndex: number) {
+    const barrage = track.barrages[removedIndex]
     if (!barrage) {
       return
     }
     const el = this.objToElm.get(barrage)!
     this.objToElm.delete(barrage)
+    this.elmToObj.delete(el)
     this.removeElement(el)
+  }
+
+  _hoverEventHandler(e: Event) {
+    const target = e.target
+    if (!target) {
+      return
+    }
+
+    const newFreezeBarrage = this.elmToObj.get(target as HTMLElement)
+    const oldFreezeBarrage = this.freezeBarrage
+
+    if (newFreezeBarrage === oldFreezeBarrage) {
+      return
+    }
+
+    this.freezeBarrage = null
+
+    if (newFreezeBarrage) {
+      this.freezeBarrage = newFreezeBarrage
+      newFreezeBarrage.freeze = true
+      setHoverStyle(target as HTMLElement)
+      this.$emit('hover', newFreezeBarrage, target as HTMLElement)
+    }
+
+    if (oldFreezeBarrage) {
+      oldFreezeBarrage.freeze = false
+      const oldFreezeElm = this.objToElm.get(oldFreezeBarrage)
+      oldFreezeElm && setUnhoverStyle(oldFreezeElm)
+      this.$emit('blur', oldFreezeBarrage, oldFreezeElm)
+    }
   }
 }

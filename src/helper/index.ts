@@ -58,6 +58,10 @@ export const isObject = function(o: any): o is object {
   return typeof o === 'object' && o !== null
 }
 
+export const isPlainObject = function(o: any): o is object {
+  return Object.prototype.toString.call(o) === '[object Object]'
+}
+
 export function deepMerge(...objects: any[]): any {
   const ret: any = {}
   objects.forEach(obj => {
@@ -70,7 +74,7 @@ export function deepMerge(...objects: any[]): any {
       } else {
         if (Array.isArray(obj[key])) {
           ret[key] = obj[key]
-        } else if (isObject(obj[key])) {
+        } else if (isPlainObject(obj[key])) {
           ret[key] = deepMerge(ret[key], obj[key])
         } else {
           ret[key] = obj[key]

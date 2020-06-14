@@ -10,6 +10,7 @@ export interface BarrageConfig {
   fontColor: string
   duration: number
   trackHeight: number
+  wrapper: HTMLElement | null
 }
 
 export interface RawBarrageObject {
@@ -24,6 +25,7 @@ export interface BarrageObject {
   size: number
   width: number
   offset: number
+  freeze?: boolean
 }
 
 export interface ScrollBarrageObject extends BarrageObject {
@@ -47,6 +49,7 @@ export interface CommanderConfig {
   trackHeight: number
   duration: number
   maxTrack: number
+  wrapper?: HTMLElement
 }
 
 export interface RollingRenderCommanderContructor {
@@ -61,4 +64,8 @@ export interface RenderEngine {
   FixedTopCommander: FixedRenderCommanderContructor
   FixedBottomCommander: FixedRenderCommanderContructor
   RollingCommander: RollingRenderCommanderContructor
+}
+
+export interface BarrageMouseEventHandler {
+  (barrage: BarrageObject, el: HTMLElement): void
 }

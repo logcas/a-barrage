@@ -1,11 +1,12 @@
 import { BarrageObject, CommanderConfig } from '../types'
 import Track from '../track'
+import EventEmitter from '../event-emitter'
 
 interface CommanderForEachHandler<T extends BarrageObject> {
   (track: Track<T>, index: number, array: Track<T>[]): void
 }
 
-export default abstract class BaseCommander<T extends BarrageObject> {
+export default abstract class BaseCommander<T extends BarrageObject> extends EventEmitter {
   protected trackWidth: number
   protected trackHeight: number
   protected duration: number
@@ -13,6 +14,7 @@ export default abstract class BaseCommander<T extends BarrageObject> {
   waitingQueue: T[] = []
 
   constructor(config: CommanderConfig) {
+    super()
     this.trackWidth = config.trackWidth
     this.trackHeight = config.trackHeight
     this.duration = config.duration

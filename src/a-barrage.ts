@@ -4,7 +4,8 @@ import {
   CommanderMap,
   CommanderMapKey,
   ScrollBarrageObject,
-  FixedBarrageObejct
+  FixedBarrageObejct,
+  BarrageMouseEventHandler
 } from './types'
 import {
   getEl,
@@ -29,7 +30,8 @@ const defaultConfig: BarrageConfig = {
   fontSize: 20,
   fontColor: '#fff',
   duration: 10000,
-  trackHeight: 20 * 1.5
+  trackHeight: 20 * 1.5,
+  wrapper: null
 }
 
 type BarrageConfigInit = Partial<BarrageConfig>
@@ -46,6 +48,8 @@ export default class BarrageMaker extends EventEmitter {
     super()
 
     this.config = deepMerge(defaultConfig, config || {})
+
+    console.log(this.config)
 
     this.el = getEl(el, this.config.engine)
 
@@ -66,7 +70,8 @@ export default class BarrageMaker extends EventEmitter {
       trackWidth: this.el.offsetWidth,
       trackHeight: this.config.trackHeight,
       maxTrack: this.config.maxTrack,
-      duration: this.config.duration
+      duration: this.config.duration,
+      wrapper: this.config.wrapper
     }
 
     const rootEle = this.config.engine === 'canvas' ? this.canvas : this.el
@@ -119,6 +124,22 @@ export default class BarrageMaker extends EventEmitter {
     }
     cancelAnimationFrame(this.animation)
     this.animation = null
+  }
+
+  onBarrageHover(handler: BarrageMouseEventHandler) {
+    if (this.config.engine === 'css3') {
+      this.commanderMap['scroll'].$on('hover', handler)
+      this.commanderMap['fixed-top'].$on('hover', handler)
+      this.commanderMap['fixed-bottom'].$on('hover', handler)
+    }
+  }
+
+  onBarrageBlur(handler: BarrageMouseEventHandler) {
+    if (this.config.engine === 'css3') {
+      this.commanderMap['scroll'].$on('blur', handler)
+      this.commanderMap['fixed-top'].$on('blur', handler)
+      this.commanderMap['fixed-bottom'].$on('blur', handler)
+    }
   }
 
   _forEachManager(

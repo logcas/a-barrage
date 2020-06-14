@@ -9,7 +9,12 @@ export function createBarrage(text: string, color: string, fontSize: string, lef
     color,
     fontSize,
     transform: `translateX(${left}px)`,
-    textShadow: '#000 1px 0 0, #000 0 1px 0, #000 -1px 0 0, #000 0 -1px 0'
+    textShadow: '#000 1px 0 0, #000 0 1px 0, #000 -1px 0 0, #000 0 -1px 0',
+    pointerEvents: 'auto',
+    padding: '3px 20px',
+    borderRadius: '20px',
+    backgroundColor: 'transparent',
+    cursor: 'pointer'
   })
   danmu.textContent = text
   return danmu
@@ -23,4 +28,12 @@ export function setStyle(el: HTMLElement, style: Partial<CSSStyleDeclaration>) {
   for (const key in style) {
     el.style[key] = style[key]!
   }
+}
+
+export function setHoverStyle(el: HTMLElement) {
+  el.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+}
+
+export function setUnhoverStyle(el: HTMLElement) {
+  el.style.backgroundColor = 'transparent'
 }
