@@ -1,4 +1,3 @@
-import TrackManager from '../track-manager'
 import BaseCommander from '../commander/base'
 
 export interface BarrageConfig {

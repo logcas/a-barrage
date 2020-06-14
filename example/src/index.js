@@ -13,12 +13,14 @@ export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mo
 
 const player = $('#my-player');
 const danmu = $('#danmu');
+// const container = $('#container');
 const barrage = new Barrage(danmu, {
   proxyObject: player,
   scroll: {
     fontSize: 28,
     duration: 5000
-  }
+  },
+  engine: 'css3'
 });
 
 ['click'].forEach(eventName => {

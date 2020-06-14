@@ -1,9 +1,8 @@
-import TrackManager from '../track-manager';
 import { FixedBarrageObejct } from '../types';
 declare const _default: {
-    add(this: TrackManager<FixedBarrageObejct>, barrage: FixedBarrageObejct): boolean;
-    find(this: TrackManager<FixedBarrageObejct>): number;
-    renderTop(this: TrackManager<FixedBarrageObejct>): void;
-    renderBottom(this: TrackManager<FixedBarrageObejct>): void;
+    add(this: any, barrage: FixedBarrageObejct): boolean;
+    find(this: any): number;
+    renderTop(this: any): void;
+    renderBottom(this: any): void;
 };
 export default _default;

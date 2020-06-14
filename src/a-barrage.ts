@@ -6,7 +6,14 @@ import {
   ScrollBarrageObject,
   FixedBarrageObejct
 } from './types'
-import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge, isCanvas } from './helper'
+import {
+  getEl,
+  requestAnimationFrame,
+  cancelAnimationFrame,
+  deepMerge,
+  isCanvas,
+  isDiv
+} from './helper'
 import EventEmitter from './event-emitter'
 import { getEngine } from './commander'
 import BaseCommander from './commander/base'
@@ -62,10 +69,11 @@ export default class BarrageMaker extends EventEmitter {
       duration: this.config.duration
     }
 
+    const rootEle = this.config.engine === 'canvas' ? this.canvas : this.el
     this.commanderMap = {
-      scroll: new renderEngine.RollingCommander(this.canvas, commanderConfig),
-      'fixed-top': new renderEngine.FixedTopCommander(this.canvas, commanderConfig),
-      'fixed-bottom': new renderEngine.FixedBottomCommander(this.canvas, commanderConfig)
+      scroll: new renderEngine.RollingCommander(rootEle, commanderConfig),
+      'fixed-top': new renderEngine.FixedTopCommander(rootEle, commanderConfig),
+      'fixed-bottom': new renderEngine.FixedBottomCommander(rootEle, commanderConfig)
     }
 
     this.resize()

@@ -1,6 +1,4 @@
-import TrackManager from '../track-manager';
-import { FixedBarrageObejct, ScrollBarrageObject } from '../types';
 declare const _default: {
-    push(this: TrackManager<ScrollBarrageObject | FixedBarrageObejct>): void;
+    push(this: any): void;
 };
 export default _default;

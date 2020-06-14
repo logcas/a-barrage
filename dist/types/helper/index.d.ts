@@ -1,7 +1,9 @@
 import { ScrollBarrageObject, FixedBarrageObejct } from '../types';
 export declare function isEmptyArray<T>(array: T[]): boolean;
 export declare function getArrayRight<T>(array: T[]): T;
-export declare function getEl(el: HTMLElement | string): HTMLElement | null;
+export declare function isDiv(el: any): el is HTMLDivElement;
+export declare function isCanvas(el: any): el is HTMLCanvasElement;
+export declare function getEl(el: HTMLDivElement | HTMLCanvasElement | string, type: 'css3' | 'canvas'): HTMLDivElement | HTMLCanvasElement;
 export declare const requestAnimationFrame: ((callback: FrameRequestCallback) => number) & typeof globalThis.requestAnimationFrame;
 export declare const cancelAnimationFrame: ((handle: number) => void) & typeof globalThis.cancelAnimationFrame;
 export declare const isFunction: (fn: any) => fn is Function;

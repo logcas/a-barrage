@@ -1,24 +1,23 @@
-import { BarrageConfig, RawBarrageObject, TrackManagerMap, TrackManagerMapKey, ScrollBarrageObject, FixedBarrageObejct } from './types';
-import TrackManager from './track-manager';
+import { BarrageConfig, RawBarrageObject, CommanderMap, CommanderMapKey, ScrollBarrageObject, FixedBarrageObejct } from './types';
 import EventEmitter from './event-emitter';
+import BaseCommander from './commander/base';
 declare type BarrageConfigInit = Partial<BarrageConfig>;
 export default class BarrageMaker extends EventEmitter {
-    canvas: HTMLCanvasElement;
-    ctx: CanvasRenderingContext2D;
+    el: HTMLDivElement | HTMLCanvasElement;
+    canvas: HTMLCanvasElement | null;
+    ctx: CanvasRenderingContext2D | null;
     config: BarrageConfig;
-    trackManagerMap: TrackManagerMap;
+    commanderMap: CommanderMap;
     animation: number | null;
-    constructor(el: HTMLElement | string, config?: BarrageConfigInit);
+    constructor(el: HTMLDivElement | HTMLCanvasElement | string, config?: BarrageConfigInit);
     resize(width?: number): void;
     clear(): void;
     setOpacity(opacity?: number): void;
     setFontSize(zoom?: number): void;
-    add(barrage: RawBarrageObject, type?: TrackManagerMapKey): void;
+    add(barrage: RawBarrageObject, type?: CommanderMapKey): void;
     start(): void;
     stop(): void;
-    _forEachManager(handler: (trackManager: TrackManager<ScrollBarrageObject> | TrackManager<FixedBarrageObejct>) => any): void;
+    _forEachManager(handler: (commander: BaseCommander<ScrollBarrageObject> | BaseCommander<FixedBarrageObejct>) => any): void;
     _render(): void;
-    _bindNativeEvents(): void;
-    _delegateEvents(): void;
 }
 export {};
