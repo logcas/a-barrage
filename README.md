@@ -1,21 +1,27 @@
 # <p align="center">A-Barrage</p>
-<p align="center">基于Canvas渲染的高性能JavaScript弹幕库</p>
+<p align="center">高性能JavaScript弹幕库</p>
 
 ## 🎦 Live Demo
 https://logcas.github.io/a-barrage/example/
 
 ## 🧐 如何使用
 
-`A-Barrage`是基于Canvas渲染的，因此你需要准备一个画布：
+`A-Barrage`同时支持`Canvas`渲染和`HTML+CSS`的渲染模式，你可以根据实际情况采用不同的渲染引擎进行弹幕的渲染。其中，`Canvas`是非交互式渲染，也就是说，采用`Canvas`渲染的弹幕并不会有任何的交互操作，纯展示性质；`HTML+CSS`是交互式渲染，如果你的网站允许用户与弹幕之间进行一些交互（如点赞、回复等），那么可以采用`HTML+CSS`的渲染模式，它会结合浏览器的DOM事件进行响应。
+
+`A-Barrage`默认使用的是`Canvas`渲染模式。
+
+### 🎞 使用`Canvas`进行弹幕渲染
+
+采用`Canvas`渲染，即意味着你需要在模板中提供一个`<canvas>`元素：
 
 ```html
 <canvas id="danmu"></canvas>
 ```
 
-然后，实例化一个`aBarrage`对象，同时传入`canvas`元素：
+然后，实例化一个`ABarrage`对象，同时传入`canvas`元素：
 
 ```js
-new aBarrage(
+new ABarrage(
   '#danmu',
   config
 )
@@ -25,6 +31,7 @@ new aBarrage(
 
 ```js
 config = {
+  engine: 'canvas', // 渲染引擎 canvas 或 css3 可选
   zoom: 1, // 文字缩放比
   proxyObject: null, // 事件代理触发对象
   usePointerEvents: true, // 屏蔽弹幕画布的点击事件
@@ -36,9 +43,55 @@ config = {
 }
 ```
 
+### ⛱ 使用`HTML+CSS`进行弹幕渲染
+
+采用`HTML+CSS`渲染，你需要做的是准备一个`<div>`元素就好：
+
+```html
+<div id="container">
+  <div id="danmu"></div>
+  <video/>
+</div>
+```
+
+然后，实例化一个`ABarrage`对象，同时传入`div`元素：
+
+```js
+new ABarrage(
+  '#danmu',
+  config
+)
+```
+
+其中，`config`对象支持如下属性（全部都是可选的，如下值为默认值）：
+
+```js
+config = {
+  engine: 'css3', // 渲染引擎 canvas 或 css3 可选
+  zoom: 1, // 文字缩放比
+  proxyObject: null, // 事件代理触发对象
+  usePointerEvents: true, // 屏蔽弹幕画布的点击事件
+  maxTrack: 4, // 最大轨道数
+  fontSize: 20, // 文字大小，单位为px
+  fontColor: '#fff', // 文字颜色
+  duration: 10000, // 弹幕留存时间
+  trackHeight: 20 * 1.5, // 轨道高度，默认为默认文字的1.5倍
+  wrapper: document.querySelector('#container') // wrapper 用于弹幕交互的事件代理，如果需要交互，则必须传入
+}
+```
+
+### 通用步骤
+
 然后，可以通过`add()`方法添加弹幕：
 ```js
+// 添加滚动弹幕
 instance.add(danmu, 'scroll')
+
+// 添加固定在顶部的弹幕
+instance.add(danmu, 'fixed-top')
+
+// 添加固定在底部的弹幕
+instance.add(danmu, 'fixed-bottom')
 ```
 
 其中，第一个参数是一个`RawBarrageObject`对象，它的类型是这样的：
@@ -55,7 +108,23 @@ RawBarrageObject {
 
 ## 📅 事件机制
 
-首先，当实例化`aBarrage`对象后，会在`wrapper`元素中插入一个`canvas`标签，并且这个画布是绝对定位的，且置于`wrapper`子元素的(`z-index`)顶层。因此，默认状态下会阻挡鼠标事件的传播。（比如你想要点击`video`标签，但被画布元素阻挡了）
+首先，为了弹幕的正常显示，你必须拥有这样的层级：
+```
+------用户视觉-------
+   👇  👇  👇  👇
+--------弹幕--------
+-------播放器-------
+```
+
+以上层级的HTML结构一般是这样的：
+```html
+<div id="container">
+  <video/>
+  <canvas id="danmu"></canvas>
+<div>
+```
+
+这样会造成一个问题，因为弹幕元素和播放器元素是兄弟元素结点，所以，当点击弹幕时，事件并无法传达到播放器上。
 
 为了解决事件被阻挡的问题，这里主要使用了两种方法：
 1. `pointer-events:none`
@@ -69,7 +138,7 @@ RawBarrageObject {
 综上，所以有了事件代理机制。
 
 ### 事件代理
-`aBarrage`类是继承自`EventEmitter`的，因此它也是一个事件中心，拥有`$on`、`$once`、`$emit`、`$off`等方法。
+`ABarrage`类是继承自`EventEmitter`的，因此它也是一个事件中心，拥有`$on`、`$once`、`$emit`、`$off`等方法。
 
 对于`click`、`dblclick`、`mousedown`、`mousemove`、`mouseout`、`mouseover`、`mouseup`这几个鼠标事件，当画布触发这些事件时，会调用`$emit`同步触发通过`$on`绑定的事件处理器。
 
@@ -117,6 +186,15 @@ RawBarrageObject {
 
 ### $emit(eventName[, ...args])
 触发事件处理器，从第二个参数开始可以传入回调函数的参数。
+
+### onBarrageHover(handler)
+**(仅作用于`HTML+CSS`渲染)**当鼠标定位到某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
+
+### onBarrageBlur(handler)
+**(仅作用于`HTML+CSS`渲染)**当鼠标从某个弹幕移出时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
+
+### onBarrageClick(handler)
+**(仅作用于`HTML+CSS`渲染)**当鼠标点击某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
 
 ## License
 MIT
