@@ -16,6 +16,7 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
     const wrapper = config.wrapper
     if (wrapper) {
       wrapper.addEventListener('mousemove', this._mouseMoveEventHandler.bind(this))
+      wrapper.addEventListener('click', this._mouseClickEventHandler.bind(this))
     }
   }
 
@@ -50,6 +51,14 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
       const oldFreezeElm = this.objToElm.get(oldFreezeBarrage)
       oldFreezeElm && setUnhoverStyle(oldFreezeElm)
       this.$emit('blur', oldFreezeBarrage, oldFreezeElm)
+    }
+  }
+
+  _mouseClickEventHandler(e: Event) {
+    const target = e.target
+    const barrageObject = this.elmToObj.get(target as HTMLElement)
+    if (barrageObject) {
+      this.$emit('click', barrageObject, target)
     }
   }
 

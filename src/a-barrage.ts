@@ -142,6 +142,14 @@ export default class BarrageMaker extends EventEmitter {
     }
   }
 
+  onBarrageClick(handler: BarrageMouseEventHandler) {
+    if (this.config.engine === 'css3') {
+      this.commanderMap['scroll'].$on('click', handler)
+      this.commanderMap['fixed-top'].$on('click', handler)
+      this.commanderMap['fixed-bottom'].$on('click', handler)
+    }
+  }
+
   _forEachManager(
     handler: (
       commander: BaseCommander<ScrollBarrageObject> | BaseCommander<FixedBarrageObejct>
