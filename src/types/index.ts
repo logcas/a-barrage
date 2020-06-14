@@ -1,6 +1,7 @@
-import TrackManager from '../track-manager'
+import BaseCommander from '../commander/base'
 
 export interface BarrageConfig {
+  engine: 'canvas' | 'css3'
   zoom: number
   proxyObject: HTMLElement | null
   usePointerEvents: boolean
@@ -9,6 +10,7 @@ export interface BarrageConfig {
   fontColor: string
   duration: number
   trackHeight: number
+  wrapper: HTMLElement | null
 }
 
 export interface RawBarrageObject {
@@ -23,6 +25,7 @@ export interface BarrageObject {
   size: number
   width: number
   offset: number
+  freeze?: boolean
 }
 
 export interface ScrollBarrageObject extends BarrageObject {
@@ -33,10 +36,36 @@ export interface FixedBarrageObejct extends BarrageObject {
   duration: number
 }
 
-export interface TrackManagerMap {
-  scroll: TrackManager<ScrollBarrageObject>
-  'fixed-top': TrackManager<FixedBarrageObejct>
-  'fixed-bottom': TrackManager<FixedBarrageObejct>
+export interface CommanderMap {
+  scroll: BaseCommander<ScrollBarrageObject>
+  'fixed-top': BaseCommander<FixedBarrageObejct>
+  'fixed-bottom': BaseCommander<FixedBarrageObejct>
 }
 
-export type TrackManagerMapKey = keyof TrackManagerMap
+export type CommanderMapKey = keyof CommanderMap
+
+export interface CommanderConfig {
+  trackWidth: number
+  trackHeight: number
+  duration: number
+  maxTrack: number
+  wrapper?: HTMLElement
+}
+
+export interface RollingRenderCommanderContructor {
+  new (...args: any[]): BaseCommander<ScrollBarrageObject>
+}
+
+export interface FixedRenderCommanderContructor {
+  new (...args: any[]): BaseCommander<FixedBarrageObejct>
+}
+
+export interface RenderEngine {
+  FixedTopCommander: FixedRenderCommanderContructor
+  FixedBottomCommander: FixedRenderCommanderContructor
+  RollingCommander: RollingRenderCommanderContructor
+}
+
+export interface BarrageMouseEventHandler {
+  (barrage: BarrageObject, el: HTMLElement): void
+}

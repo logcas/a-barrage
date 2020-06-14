@@ -28,6 +28,13 @@ export default class BarrageTrack<T extends BarrageObject> {
     this.barrages.shift()
   }
 
+  remove(index: number) {
+    if (index < 0 || index >= this.barrages.length) {
+      return
+    }
+    this.barrages.splice(index, 1)
+  }
+
   updateOffset() {
     const endBarrage = this.barrages[this.barrages.length - 1]
     if (endBarrage && isScrollBarrage(endBarrage)) {

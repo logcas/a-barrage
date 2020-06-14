@@ -9,6 +9,7 @@ export default class BarrageTrack<T extends BarrageObject> {
     reset(): void;
     push(...items: T[]): void;
     removeTop(): void;
+    remove(index: number): void;
     updateOffset(): void;
 }
 export {};

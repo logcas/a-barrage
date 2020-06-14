@@ -4,7 +4,7 @@ import faker from 'faker/locale/zh_CN';
 function mockBarrage() {
   return {
     text: faker.lorem.words(),
-    color: Math.random() > 0.5 ? '#fff' : faker.internet.color().toUpperCase()
+    color: '#fff'
   };
 }
 
@@ -13,12 +13,28 @@ export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mo
 
 const player = $('#my-player');
 const danmu = $('#danmu');
+const container = $('#container');
 const barrage = new Barrage(danmu, {
   proxyObject: player,
   scroll: {
     fontSize: 28,
     duration: 5000
-  }
+  },
+  engine: 'css3',
+  usePointerEvents: true,
+  wrapper: container
+});
+
+barrage.onBarrageBlur((barrage) => {
+  console.log(`blur: ${barrage.text}`);
+});
+
+barrage.onBarrageHover((barrage) => {
+  console.log(`hover: ${barrage.text}`);
+});
+
+barrage.onBarrageClick((barrage) => {
+  console.log(`click: ${barrage.text}`);
 });
 
 ['click'].forEach(eventName => {
