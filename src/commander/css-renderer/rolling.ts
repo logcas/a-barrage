@@ -3,7 +3,7 @@ import { ScrollBarrageObject, CommanderConfig } from '../../types'
 import { isEmptyArray, getArrayRight } from '../../helper'
 import { TIME_PER_FRAME } from '../../constants'
 import Track from '../../track'
-import { createBarrage, appendChild, setUnhoverStyle, setHoverStyle } from '../../helper/css'
+import { createBarrage, appendChild } from '../../helper/css'
 
 export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageObject> {
   constructor(el: HTMLDivElement, config: CommanderConfig) {
