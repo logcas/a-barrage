@@ -52,4 +52,18 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
       this.$emit('blur', oldFreezeBarrage, oldFreezeElm)
     }
   }
+
+  reset() {
+    console.log('call reset')
+    this.forEach(track => {
+      track.forEach(barrage => {
+        const el = this.objToElm.get(barrage)
+        if (!el) {
+          return
+        }
+        this.removeElement(el)
+      })
+      track.reset()
+    })
+  }
 }

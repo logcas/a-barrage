@@ -30,9 +30,9 @@ export default abstract class BaseCommander<T extends BarrageObject> extends Eve
     }
   }
 
-  reset() {
-    this.forEach(track => track.reset())
-  }
+  // reset() {
+  //   this.forEach(track => track.reset())
+  // }
 
   resize(width?: number, height?: number) {
     if (width) {
@@ -51,4 +51,6 @@ export default abstract class BaseCommander<T extends BarrageObject> extends Eve
   abstract _extractBarrage(): void
   // 渲染函数
   abstract render(): void
+  // 清空
+  abstract reset(): void
 }

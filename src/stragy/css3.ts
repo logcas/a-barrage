@@ -5,7 +5,9 @@ import { RawBarrageObject, CommanderMapKey, ScrollBarrageObject } from '../types
 import { requestAnimationFrame } from '../helper'
 
 export default {
-  clear(this: BarrageMaker) {},
+  clear(this: BarrageMaker) {
+    this._forEachManager(manager => manager.reset())
+  },
   add(this: BarrageMaker, barrage: RawBarrageObject, type: CommanderMapKey = 'scroll') {
     const { text, color = this.config.fontColor, size = this.config.fontSize } = barrage
     const fontColor = color

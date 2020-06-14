@@ -12,4 +12,8 @@ export default abstract class BaseCanvasCommander<T extends BarrageObject> exten
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')!
   }
+
+  reset() {
+    this.forEach(track => track.reset())
+  }
 }
