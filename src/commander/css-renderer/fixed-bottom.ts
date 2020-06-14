@@ -23,6 +23,9 @@ export default class FixedTopCommander extends BaseFixedCommander {
       if (!el) {
         return
       }
+      if (barrage.freeze) {
+        return
+      }
       const { offset } = barrage
       const y = yBase + trackIndex * trackHeight
       el.style.transform = `translate(${offset}px, ${y}px)`
