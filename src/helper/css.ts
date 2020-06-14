@@ -8,7 +8,8 @@ export function createBarrage(text: string, color: string, fontSize: string, lef
     position: 'absolute',
     color,
     fontSize,
-    transform: `translateX(${left}px)`
+    transform: `translateX(${left}px)`,
+    textShadow: '#000 1px 0 0, #000 0 1px 0, #000 -1px 0 0, #000 0 -1px 0'
   })
   danmu.textContent = text
   return danmu
