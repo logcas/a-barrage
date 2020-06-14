@@ -6,18 +6,8 @@ import Track from '../../track'
 import { createBarrage, appendChild, setUnhoverStyle, setHoverStyle } from '../../helper/css'
 
 export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageObject> {
-  // ScrollBarrageObject ---> HTML 的映射
-  objToElm: WeakMap<ScrollBarrageObject, HTMLElement> = new WeakMap()
-  elmToObj: WeakMap<HTMLElement, ScrollBarrageObject> = new WeakMap()
-  freezeBarrage: ScrollBarrageObject | null = null
-
   constructor(el: HTMLDivElement, config: CommanderConfig) {
     super(el, config)
-
-    const wrapper = config.wrapper
-    if (wrapper) {
-      wrapper.addEventListener('mousemove', this._mouseMoveEventHandler.bind(this))
-    }
   }
 
   private get _defaultSpeed(): number {
@@ -133,35 +123,5 @@ export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageO
     this.objToElm.delete(barrage)
     this.elmToObj.delete(el)
     this.removeElement(el)
-  }
-
-  _mouseMoveEventHandler(e: Event) {
-    const target = e.target
-    if (!target) {
-      return
-    }
-
-    const newFreezeBarrage = this.elmToObj.get(target as HTMLElement)
-    const oldFreezeBarrage = this.freezeBarrage
-
-    if (newFreezeBarrage === oldFreezeBarrage) {
-      return
-    }
-
-    this.freezeBarrage = null
-
-    if (newFreezeBarrage) {
-      this.freezeBarrage = newFreezeBarrage
-      newFreezeBarrage.freeze = true
-      setHoverStyle(target as HTMLElement)
-      this.$emit('hover', newFreezeBarrage, target as HTMLElement)
-    }
-
-    if (oldFreezeBarrage) {
-      oldFreezeBarrage.freeze = false
-      const oldFreezeElm = this.objToElm.get(oldFreezeBarrage)
-      oldFreezeElm && setUnhoverStyle(oldFreezeElm)
-      this.$emit('blur', oldFreezeBarrage, oldFreezeElm)
-    }
   }
 }

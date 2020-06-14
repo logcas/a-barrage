@@ -4,9 +4,6 @@ import Track from '../../track'
 import { isEmptyArray } from '../../helper'
 
 export default abstract class BaseFixedCssCommander extends BaseCssCommander<FixedBarrageObejct> {
-  // FixedBarrageObejct ---> HTML 的映射
-  objToElm: WeakMap<FixedBarrageObejct, HTMLElement> = new WeakMap()
-
   constructor(el: HTMLDivElement, config: CommanderConfig) {
     super(el, config)
   }
