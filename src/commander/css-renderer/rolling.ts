@@ -16,7 +16,7 @@ export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageO
 
     const wrapper = config.wrapper
     if (wrapper) {
-      wrapper.addEventListener('mousemove', this._hoverEventHandler.bind(this))
+      wrapper.addEventListener('mousemove', this._mouseMoveEventHandler.bind(this))
     }
   }
 
@@ -135,7 +135,7 @@ export default class RollingCssCommander extends BaseCssCommander<ScrollBarrageO
     this.removeElement(el)
   }
 
-  _hoverEventHandler(e: Event) {
+  _mouseMoveEventHandler(e: Event) {
     const target = e.target
     if (!target) {
       return
