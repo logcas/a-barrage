@@ -1,6 +1,6 @@
 import BaseCommander from '../base'
 import { BarrageObject, CommanderConfig } from '../../types'
-import { setHoverStyle, setUnhoverStyle } from '../../helper/css'
+import { setHoverStyle, setBlurStyle } from '../../helper/css'
 
 export default abstract class BaseCssCommander<T extends BarrageObject> extends BaseCommander<T> {
   el: HTMLDivElement
@@ -49,7 +49,7 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
     if (oldFreezeBarrage) {
       oldFreezeBarrage.freeze = false
       const oldFreezeElm = this.objToElm.get(oldFreezeBarrage)
-      oldFreezeElm && setUnhoverStyle(oldFreezeElm)
+      oldFreezeElm && setBlurStyle(oldFreezeElm)
       this.$emit('blur', oldFreezeBarrage, oldFreezeElm)
     }
   }

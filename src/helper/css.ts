@@ -34,7 +34,7 @@ export function setHoverStyle(el: HTMLElement) {
   el.style.cursor = 'pointer'
 }
 
-export function setUnhoverStyle(el: HTMLElement) {
+export function setBlurStyle(el: HTMLElement) {
   el.style.backgroundColor = 'transparent'
   el.style.cursor = 'auto'
 }
