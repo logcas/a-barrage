@@ -34,7 +34,7 @@
     "precommit": "lint-staged",
     "travis-deploy-once": "travis-deploy-once",
     "example": "webpack-dev-server --config=./example/webpack.config.js",
-    "build:demo": "webpack --config=./example/webpack.config.js"
+    "build:demo": "webpack --config=./example/webpack.prod.js"
   },
   "lint-staged": {
     "{src,test}/**/*.ts": [

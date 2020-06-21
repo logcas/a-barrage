@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ABarrage Demo Page</title>
+  <link href="https://vjs.zencdn.net/7.7.6/video-js.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+  <div style="width: 960px; margin: 20px auto;">
+    <div id="container" style="width: 960px; position: relative;">
+      <video id="my-player" class="video-js" controls preload="auto" poster="https://vjs.zencdn.net/v/oceans.png"
+        data-setup='{}'>
+        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
+        </source>
+        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm">
+        </source>
+        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
+        </source>
+      </video>
+      <div id="danmu" style="position: absolute; top: 0; left: 0; overflow: hidden;"></div>
+    </div>
+    <div id="dashboard" style="text-align: left;">
+      <div style="margin-top: 10px;">
+        <span>输入弹幕：</span>
+        <el-input v-model="barrageText" placeholder="请输入内容" style="width: 400px;"></el-input>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('scroll')">发送滚动弹幕</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-top')">发送顶部弹幕</el-button>
+        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-bottom')">发送底部弹幕</el-button>
+      </div>
+      <div style="margin-top: 10px;">
+        <span>弹幕不透明度：</span>
+        <el-slider v-model="opacity" :step="0.1" :min="0" :max="1" show-stops @change="opacityChange"></el-slider>
+      </div>
+      <div style="margin-top: 10px;">
+        <span>设置字体文字大小：</span>
+        <el-slider v-model="fontBase" :step="0.1" :min="0.5" :max="2" @change="fontSizeChange"></el-slider>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</html>

@@ -4,45 +4,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VideoJS Test Page</title>
-  <link href="https://vjs.zencdn.net/7.7.6/video-js.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <title>ABarrage 高性能JavaScript弹幕库</title>
+  <link href="https://fonts.font.im/css?family=Ubuntu" rel="stylesheet">
 </head>
 
+<style>
+html, body {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  user-select: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #94c8fc;
+}
+
+#center-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#header {
+  padding: 30px 0;
+}
+
+.title {
+  font-size: 60px;
+  padding: 10px 0;
+  font-family: 'Ubuntu', sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+#content {
+  padding: 50px 0;
+}
+
+.link {
+  position: relative;
+  padding: 20px 40px;
+  margin: 10px 20px;
+  background: #4aa2fa;
+}
+
+.link::after {
+  content: " ";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #2a90f7;
+  transition: all .2s ease;
+}
+
+.link:hover::after {
+  top: 0;
+}
+
+.link-text {
+  position: relative;
+  z-index: 2;
+}
+
+#danmu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+</style>
+
 <body>
-  <div style="width: 960px; margin: 20px auto;">
-    <div id="container" style="width: 960px; position: relative;">
-      <video id="my-player" class="video-js" controls preload="auto" poster="https://vjs.zencdn.net/v/oceans.png"
-        data-setup='{}'>
-        <source src="https://vjs.zencdn.net/v/oceans.mp4" type="video/mp4">
-        </source>
-        <source src="https://vjs.zencdn.net/v/oceans.webm" type="video/webm">
-        </source>
-        <source src="https://vjs.zencdn.net/v/oceans.ogv" type="video/ogg">
-        </source>
-      </video>
-      <canvas id="danmu" style="position: absolute; top: 0; left: 0;"></canvas>
-    </div>
-    <div id="dashboard" style="text-align: left;">
-      <div style="margin-top: 10px;">
-        <span>输入弹幕：</span>
-        <el-input v-model="barrageText" placeholder="请输入内容" style="width: 400px;"></el-input>
-        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('scroll')">发送滚动弹幕</el-button>
-        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-top')">发送顶部弹幕</el-button>
-        <el-button type="primary" style="margin-left: 10px;" @click="sendBarrage('fixed-bottom')">发送底部弹幕</el-button>
+  <div id="container">
+    <canvas id="danmu"></canvas>
+    <div id="center-wrapper">
+      <div id="header">
+        <h1 class="title">ABarrage</h1>
+        <h4 class="sub-title">高性能JavaScript弹幕库</h4>
       </div>
-      <div style="margin-top: 10px;">
-        <span>弹幕不透明度：</span>
-        <el-slider v-model="opacity" :step="0.1" :min="0" :max="1" show-stops @change="opacityChange"></el-slider>
+      <div id="content">
+        <a class="link" href="canvas/index.html">
+          <span class="link-text">Canvas渲染模式</span></a>
+        <a class="link" href="css3/index.html">
+          <span class="link-text">HTML+CSS渲染模式</span>
+        </a>
       </div>
-      <div style="margin-top: 10px;">
-        <span>设置字体文字大小：</span>
-        <el-slider v-model="fontBase" :step="0.1" :min="0.5" :max="2" @change="fontSizeChange"></el-slider>
+      <div id="github">
+        <a target="blank" href="https://github.com/logcas/a-barrage" noopener>View on Github</a>
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/element-ui@2.13.2/lib/element-ui.common.min.js"></script>
-  <script src="bundle.js"></script></body>
-
-</html>
+</html><script src="index.bundle.js"></script>
