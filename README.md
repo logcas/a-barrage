@@ -187,14 +187,14 @@ RawBarrageObject {
 ### $emit(eventName[, ...args])
 触发事件处理器，从第二个参数开始可以传入回调函数的参数。
 
-### onBarrageHover(handler)
-**(仅作用于`HTML+CSS`渲染)**当鼠标定位到某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
+### onBarrageHover(handler) `***仅作用于HTML+CSS渲染***`
+当鼠标定位到某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
 
-### onBarrageBlur(handler)
-**(仅作用于`HTML+CSS`渲染)**当鼠标从某个弹幕移出时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
+### onBarrageBlur(handler) `***仅作用于HTML+CSS渲染***`
+当鼠标从某个弹幕移出时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
 
-### onBarrageClick(handler)
-**(仅作用于`HTML+CSS`渲染)**当鼠标点击某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
+### onBarrageClick(handler) `***仅作用于HTML+CSS渲染***`
+当鼠标点击某个弹幕时触发，`handler`回调函数的参数分别为：弹幕实例、弹幕对应的DOM元素。
 
 ## License
 MIT
