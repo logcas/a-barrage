@@ -472,8 +472,7 @@ function createBarrage(text, color, fontSize, left) {
         pointerEvents: 'auto',
         padding: '3px 20px',
         borderRadius: '20px',
-        backgroundColor: 'transparent',
-        cursor: 'pointer'
+        backgroundColor: 'transparent'
     });
     danmu.textContent = text;
     return danmu;
@@ -488,11 +487,12 @@ function setStyle(el, style) {
 }
 function setHoverStyle(el) {
     el.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    el.style.cursor = 'pointer';
 }
-function setUnhoverStyle(el) {
+function setBlurStyle(el) {
     el.style.backgroundColor = 'transparent';
+    el.style.cursor = 'auto';
 }
-//# sourceMappingURL=css.js.map
 
 var BaseCssCommander = /** @class */ (function (_super) {
     __extends(BaseCssCommander, _super);
@@ -503,7 +503,7 @@ var BaseCssCommander = /** @class */ (function (_super) {
         _this.freezeBarrage = null;
         _this.el = el;
         var wrapper = config.wrapper;
-        if (wrapper) {
+        if (wrapper && config.interactive) {
             wrapper.addEventListener('mousemove', _this._mouseMoveEventHandler.bind(_this));
             wrapper.addEventListener('click', _this._mouseClickEventHandler.bind(_this));
         }
@@ -532,7 +532,7 @@ var BaseCssCommander = /** @class */ (function (_super) {
         if (oldFreezeBarrage) {
             oldFreezeBarrage.freeze = false;
             var oldFreezeElm = this.objToElm.get(oldFreezeBarrage);
-            oldFreezeElm && setUnhoverStyle(oldFreezeElm);
+            oldFreezeElm && setBlurStyle(oldFreezeElm);
             this.$emit('blur', oldFreezeBarrage, oldFreezeElm);
         }
     };
@@ -558,7 +558,6 @@ var BaseCssCommander = /** @class */ (function (_super) {
     };
     return BaseCssCommander;
 }(BaseCommander));
-//# sourceMappingURL=base-css.js.map
 
 var BaseFixedCssCommander = /** @class */ (function (_super) {
     __extends(BaseFixedCssCommander, _super);
@@ -945,7 +944,7 @@ var Css3Stragy = {
         if (type === void 0) { type = 'scroll'; }
         var text = barrage.text, _a = barrage.color, color = _a === void 0 ? this.config.fontColor : _a, _b = barrage.size, size = _b === void 0 ? this.config.fontSize : _b;
         var fontColor = color;
-        // const fontSize = size + 'px';
+        var fontSize = size * this.config.zoom;
         var trackWidth = this.el.offsetWidth;
         // const posLeft = trackWidth + 'px';
         // const danmu = createBarrage(text, fontColor, fontSize, posLeft);
@@ -956,7 +955,7 @@ var Css3Stragy = {
                 text: text,
                 width: 0,
                 color: fontColor,
-                size: size,
+                size: fontSize,
                 speed: 0,
                 offset: trackWidth
             };
@@ -968,7 +967,7 @@ var Css3Stragy = {
                 text: text,
                 width: 0,
                 color: fontColor,
-                size: size,
+                size: fontSize,
                 duration: this.config.duration,
                 offset: trackWidth
             };
@@ -998,7 +997,8 @@ var defaultConfig = {
     fontColor: '#fff',
     duration: 10000,
     trackHeight: 20 * 1.5,
-    wrapper: null
+    wrapper: null,
+    interactive: true
 };
 var BarrageMaker = /** @class */ (function (_super) {
     __extends(BarrageMaker, _super);
@@ -1026,7 +1026,8 @@ var BarrageMaker = /** @class */ (function (_super) {
             trackHeight: _this.config.trackHeight,
             maxTrack: _this.config.maxTrack,
             duration: _this.config.duration,
-            wrapper: _this.config.wrapper
+            wrapper: _this.config.wrapper,
+            interactive: _this.config.interactive
         };
         var rootEle = _this.config.engine === 'canvas' ? _this.canvas : _this.el;
         _this.commanderMap = {
@@ -1102,6 +1103,7 @@ var BarrageMaker = /** @class */ (function (_super) {
     };
     return BarrageMaker;
 }(EventEmitter));
+//# sourceMappingURL=a-barrage.js.map
 
 export default BarrageMaker;
 //# sourceMappingURL=barrage.es5.js.map
