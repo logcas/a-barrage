@@ -16,7 +16,7 @@ export default {
   add(this: BarrageMaker, barrage: RawBarrageObject, type: CommanderMapKey = 'scroll') {
     const { text, color = this.config.fontColor, size = this.config.fontSize } = barrage
     const fontColor = color
-    // const fontSize = size + 'px';
+    const fontSize = size * this.config.zoom
     const trackWidth = this.el.offsetWidth
     // const posLeft = trackWidth + 'px';
 
@@ -28,7 +28,7 @@ export default {
         text,
         width: 0,
         color: fontColor,
-        size: size,
+        size: fontSize,
         speed: 0,
         offset: trackWidth
       }
@@ -39,7 +39,7 @@ export default {
         text,
         width: 0,
         color: fontColor,
-        size,
+        size: fontSize,
         duration: this.config.duration,
         offset: trackWidth
       }
