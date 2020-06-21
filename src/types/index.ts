@@ -11,6 +11,7 @@ export interface BarrageConfig {
   duration: number
   trackHeight: number
   wrapper: HTMLElement | null
+  interactive: boolean
 }
 
 export interface RawBarrageObject {
@@ -50,6 +51,7 @@ export interface CommanderConfig {
   duration: number
   maxTrack: number
   wrapper?: HTMLElement
+  interactive: boolean
 }
 
 export interface RollingRenderCommanderContructor {

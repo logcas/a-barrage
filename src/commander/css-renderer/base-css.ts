@@ -14,7 +14,7 @@ export default abstract class BaseCssCommander<T extends BarrageObject> extends 
     this.el = el
 
     const wrapper = config.wrapper
-    if (wrapper) {
+    if (wrapper && config.interactive) {
       wrapper.addEventListener('mousemove', this._mouseMoveEventHandler.bind(this))
       wrapper.addEventListener('click', this._mouseClickEventHandler.bind(this))
     }

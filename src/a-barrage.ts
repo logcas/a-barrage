@@ -24,7 +24,8 @@ const defaultConfig: BarrageConfig = {
   fontColor: '#fff',
   duration: 10000,
   trackHeight: 20 * 1.5,
-  wrapper: null
+  wrapper: null,
+  interactive: true
 }
 
 type BarrageConfigInit = Partial<BarrageConfig>
@@ -64,7 +65,8 @@ export default class BarrageMaker extends EventEmitter {
       trackHeight: this.config.trackHeight,
       maxTrack: this.config.maxTrack,
       duration: this.config.duration,
-      wrapper: this.config.wrapper
+      wrapper: this.config.wrapper,
+      interactive: this.config.interactive
     }
 
     const rootEle = this.config.engine === 'canvas' ? this.canvas : this.el
