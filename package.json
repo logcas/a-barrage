@@ -1,6 +1,6 @@
 {
   "name": "a-barrage",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "JavaScript Danmu(Barrage) Library",
   "keywords": [],
   "main": "dist/barrage.umd.js",
@@ -12,7 +12,7 @@
   "author": "everlastlucas <everlastlucas@outlook.com>",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/logcas/a-barrage.git"
   },
   "license": "MIT",
   "engines": {
