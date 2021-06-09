@@ -2,8 +2,14 @@ export function createElement(tagName: string) {
   return document.createElement(tagName)
 }
 
-export function createBarrage(text: string, color: string, fontSize: string, left: string) {
-  const danmu = createElement('div')
+export function createBarrage(
+  text: string,
+  color: string,
+  fontSize: string,
+  left: string,
+  el?: HTMLElement
+) {
+  const danmu = el || createElement('div')
   setStyle(danmu, {
     position: 'absolute',
     color,

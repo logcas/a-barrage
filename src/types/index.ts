@@ -3,15 +3,16 @@ import BaseCommander from '../commander/base'
 export interface BarrageConfig {
   engine: 'canvas' | 'css3'
   zoom: number
-  proxyObject: HTMLElement | null
+  proxyObject: HTMLElement | undefined
   usePointerEvents: boolean
   maxTrack: number
   fontSize: number
   fontColor: string
   duration: number
   trackHeight: number
-  wrapper: HTMLElement | null
+  wrapper: HTMLElement | undefined
   interactive: boolean
+  poolSize: number
 }
 
 export interface RawBarrageObject {
@@ -52,6 +53,7 @@ export interface CommanderConfig {
   maxTrack: number
   wrapper?: HTMLElement
   interactive: boolean
+  poolSize: number
 }
 
 export interface RollingRenderCommanderContructor {

@@ -5,7 +5,8 @@ import {
   CommanderMapKey,
   ScrollBarrageObject,
   FixedBarrageObejct,
-  BarrageMouseEventHandler
+  BarrageMouseEventHandler,
+  CommanderConfig
 } from './types'
 import { getEl, requestAnimationFrame, cancelAnimationFrame, deepMerge, isCanvas } from './helper'
 import EventEmitter from './event-emitter'
@@ -17,15 +18,16 @@ import { getHandler, FnMap } from './stragy'
 const defaultConfig: BarrageConfig = {
   engine: 'canvas',
   zoom: 1,
-  proxyObject: null,
+  proxyObject: undefined,
   usePointerEvents: true,
   maxTrack: 4,
   fontSize: 20,
   fontColor: '#fff',
   duration: 10000,
   trackHeight: 20 * 1.5,
-  wrapper: null,
-  interactive: true
+  wrapper: undefined,
+  interactive: true,
+  poolSize: 20
 }
 
 type BarrageConfigInit = Partial<BarrageConfig>
@@ -60,13 +62,14 @@ export default class BarrageMaker extends EventEmitter {
 
     // 获取渲染引擎
     const renderEngine = getEngine(this.config.engine)!
-    const commanderConfig = {
+    const commanderConfig: CommanderConfig = {
       trackWidth: this.el.offsetWidth,
       trackHeight: this.config.trackHeight,
       maxTrack: this.config.maxTrack,
       duration: this.config.duration,
       wrapper: this.config.wrapper,
-      interactive: this.config.interactive
+      interactive: this.config.interactive,
+      poolSize: this.config.poolSize
     }
 
     const rootEle = this.config.engine === 'canvas' ? this.canvas : this.el
