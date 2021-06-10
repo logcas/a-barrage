@@ -13,6 +13,8 @@ export const HTML_ELEMENT_NATIVE_EVENTS = 'click,dblclick,mousedown,mousemove,mo
 
 const player = $('#my-player');
 const danmu = $('#danmu');
+danmu.width = 960;
+danmu.height = 400;
 // const container = $('#container');
 const barrage = new Barrage(danmu, {
   proxyObject: player,
@@ -21,7 +23,8 @@ const barrage = new Barrage(danmu, {
     duration: 5000
   },
   engine: 'canvas',
-  usePointerEvents: true
+  usePointerEvents: true,
+  trackWidth: 960
 });
 
 ['click'].forEach(eventName => {
@@ -40,33 +43,33 @@ player.onplay = () => {
   console.log('start');
   barrage.start();
   timer = setTimeout(function insertBarrage() {
-    let sumScroll = 1 + Math.floor(5 * Math.random());
+    let sumScroll = 10 + Math.floor(50 * Math.random());
     while(sumScroll--) {
       barrage.add(mockBarrage(), 'scroll');
     }
 
-    let sumFixedTop = 1 + Math.floor(5 * Math.random());
-    while(sumFixedTop--) {
-      barrage.add(mockBarrage(), 'fixed-top');
-    }
+    // let sumFixedTop = 10 + Math.floor(50 * Math.random());
+    // while(sumFixedTop--) {
+    //   barrage.add(mockBarrage(), 'fixed-top');
+    // }
 
-    let sumFixedBottom = 1 + Math.floor(5 * Math.random());
-    while(sumFixedBottom--) {
-      barrage.add(mockBarrage(), 'fixed-bottom');
-    }
+    // let sumFixedBottom = 10 + Math.floor(50 * Math.random());
+    // while(sumFixedBottom--) {
+    //   barrage.add(mockBarrage(), 'fixed-bottom');
+    // }
 
     timer = setTimeout(insertBarrage, 2000 + Math.floor(Math.random() * 10000));
   }, 2000);
 };
-player.onresize = () => {
-  console.log('onresize');
-  resizeDanmu();
-};
+// player.onresize = () => {
+//   console.log('onresize');
+//   resizeDanmu();
+// };
 player.onseeked = () => {
   barrage.clear();
 };
 
-resizeDanmu();
+// resizeDanmu();
 
 function resizeDanmu() {
   const { width, height } = player.getBoundingClientRect();

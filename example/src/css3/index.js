@@ -23,7 +23,8 @@ const barrage = new Barrage(danmu, {
   engine: 'css3',
   usePointerEvents: true,
   wrapper: container,
-  interactive: true
+  interactive: true,
+  trackWidth: 960 
 });
 
 barrage.onBarrageBlur((barrage) => {
@@ -54,42 +55,42 @@ player.onplay = () => {
   console.log('start');
   barrage.start();
   timer = setTimeout(function insertBarrage() {
-    let sumScroll = 1 + Math.floor(5 * Math.random());
+    let sumScroll = 10 + Math.floor(50 * Math.random());
     while(sumScroll--) {
       barrage.add(mockBarrage(), 'scroll');
     }
 
-    let sumFixedTop = 1 + Math.floor(5 * Math.random());
-    while(sumFixedTop--) {
-      barrage.add(mockBarrage(), 'fixed-top');
-    }
+    // let sumFixedTop = 10 + Math.floor(50 * Math.random());
+    // while(sumFixedTop--) {
+    //   barrage.add(mockBarrage(), 'fixed-top');
+    // }
 
-    let sumFixedBottom = 1 + Math.floor(5 * Math.random());
-    while(sumFixedBottom--) {
-      barrage.add(mockBarrage(), 'fixed-bottom');
-    }
+    // let sumFixedBottom = 10 + Math.floor(50 * Math.random());
+    // while(sumFixedBottom--) {
+    //   barrage.add(mockBarrage(), 'fixed-bottom');
+    // }
 
     timer = setTimeout(insertBarrage, 2000 + Math.floor(Math.random() * 10000));
   }, 2000);
 };
-player.onresize = () => {
-  console.log('onresize');
-  resizeDanmu();
-};
+// player.onresize = () => {
+//   console.log('onresize');
+//   resizeDanmu();
+// };
 player.onseeked = () => {
   barrage.clear();
 };
 
-resizeDanmu();
+// resizeDanmu();
 
-function resizeDanmu() {
-  const { width, height } = player.getBoundingClientRect();
-  danmu.width = width;
-  danmu.height = height;
-  danmu.style.width = width + 'px';
-  danmu.style.height = height + 'px';
-  barrage.resize(width);
-}
+// function resizeDanmu() {
+//   const { width, height } = player.getBoundingClientRect();
+//   danmu.width = width;
+//   danmu.height = height;
+//   danmu.style.width = width + 'px';
+//   danmu.style.height = height + 'px';
+//   barrage.resize(width);
+// }
 
 new Vue({
   el: '#dashboard',
