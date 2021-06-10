@@ -55,7 +55,7 @@ player.onplay = () => {
   console.log('start');
   barrage.start();
   timer = setTimeout(function insertBarrage() {
-    let sumScroll = 10 + Math.floor(50 * Math.random());
+    let sumScroll = 1 + Math.floor(5 * Math.random());
     while(sumScroll--) {
       barrage.add(mockBarrage(), 'scroll');
     }
